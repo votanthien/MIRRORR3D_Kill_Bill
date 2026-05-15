@@ -1,0 +1,122 @@
+newmtl Shield
+d 1
+Kd 0.75294119 0.75294119 0.75294119
+map_Kd ./Maps/Shield.jpg
+
+newmtl Grape
+d 1
+Kd 0.17647059 0.078431375 0.30980393
+
+newmtl Orange
+d 1
+Kd 0.96078432 1 0.88235295
+map_Kd ./Maps/Fruits.jpg
+
+newmtl Cabinet
+d 1
+Kd 1 1 0.86274511
+map_Kd ./Maps/Cabinet.jpg
+
+newmtl Iron
+d 1
+Kd 0.2 0.19607843 0.19607843
+
+newmtl WoodenOrnament
+d 1
+Kd 1 1 1
+map_Kd ./Maps/walnut.jpg
+
+newmtl FirePlace
+d 1
+Kd 0.98431373 0.98823529 1
+map_Kd ./Maps/FirePlace.jpg
+
+newmtl Bronze
+d 1
+Kd 0.78431374 0.47450981 0.3137255
+
+newmtl WoodenBowl
+d 1
+Ns 1
+Ni 0
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd ./Maps/WoodenBowl.jpg
+
+newmtl FireWood
+d 1
+Kd 1 1 1
+map_Kd ./Maps/Log.jpg
+
+newmtl Floor
+d 1
+Kd 0.98039216 1 0.98039216
+map_Kd ./Maps/FloorCarpet.jpg
+
+newmtl DeerHead
+d 1
+Kd 0.80000001 0.81960785 0.81176472
+map_Kd ./Maps/DeerHead.jpg
+
+newmtl WoodBeam
+d 1
+Kd 0.99607843 1 0.93725491
+map_Kd ./Maps/Beam.jpg
+
+newmtl ChestBox
+d 1
+Kd 0.99215686 0.97647059 1
+map_Kd ./Maps/ChestBox.jpg
+
+newmtl Apple
+d 1
+Kd 0.96078432 1 0.88235295
+map_Kd ./Maps/Fruits.jpg
+
+newmtl DiningTable
+d 1
+Kd 1 1 0.86274511
+map_Kd ./Maps/DiningTable.jpg
+
+newmtl Candle
+d 0.995
+Kd 0.72941178 0.64313728 0.36862746
+
+newmtl Plate
+d 1
+Kd 1 1 1
+map_Kd ./Maps/Plate.jpg
+
+newmtl Goblet
+d 0.995
+Kd 0.72941178 0.72941178 0.72941178
+
+newmtl Walls
+d 1
+Kd 0.82352942 0.80784315 0.72941178
+map_Kd ./Maps/medieval_stone_blocks.jpg
+
+newmtl Twigs
+d 1
+Kd 0.094117649 0.054901961 0.035294119
+
+newmtl WoodCeiling
+d 1
+Kd 1 1 1
+map_Kd ./Maps/walnut.jpg
+
+newmtl DiningChair
+d 1
+Kd 1 1 0.86274511
+map_Kd ./Maps/DiningChair.jpg
+
+newmtl Gold
+d 1
+Kd 1 0.88627452 0.60784316
+
+newmtl Flame
+d 1
+Kd 0 0 0
+
