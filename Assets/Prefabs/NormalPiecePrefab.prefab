@@ -167,14 +167,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorSprites:
-  - color: 0
-    sprite: {fileID: 21300000, guid: e29e5c50eb44a82419421fea09be3ecc, type: 3}
-  - color: 1
-    sprite: {fileID: 21300000, guid: 1135bb60951193b48b0abe5d01de0386, type: 3}
-  - color: 2
-    sprite: {fileID: 21300000, guid: 60172776f27911d49a3eefdabe14db05, type: 3}
   - color: 3
+    sprite: {fileID: 21300000, guid: e29e5c50eb44a82419421fea09be3ecc, type: 3}
+  - color: 5
+    sprite: {fileID: 21300000, guid: 1135bb60951193b48b0abe5d01de0386, type: 3}
+  - color: 1
+    sprite: {fileID: 21300000, guid: 60172776f27911d49a3eefdabe14db05, type: 3}
+  - color: 2
     sprite: {fileID: 21300000, guid: 5883b85230b5f94418632fa1c1b1b605, type: 3}
+  - color: 0
+    sprite: {fileID: 21300000, guid: 4598661072bfa6945a5305c9a4bbb24f, type: 3}
 --- !u!61 &61605422268151138
 BoxCollider2D:
   m_ObjectHideFlags: 0
