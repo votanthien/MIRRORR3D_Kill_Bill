@@ -11,7 +11,7 @@ namespace Match3
             public ColorType color;
             public Sprite sprite;
         }
-
+        [SerializeField] private ColorType currentColor;
         public ColorSprite[] colorSprites;
 
         private ColorType _color;
@@ -25,7 +25,8 @@ namespace Match3
         public int NumColors => colorSprites.Length;
 
         private SpriteRenderer _sprite;
-        private Dictionary<ColorType, Sprite> _colorSpriteDict;
+        [SerializeField]
+        public Dictionary<ColorType, Sprite> _colorSpriteDict;
 
         private void Awake ()
         {
@@ -46,7 +47,7 @@ namespace Match3
         public void SetColor(ColorType newColor)
         {
             _color = newColor;
-
+            currentColor = newColor;
             if (_colorSpriteDict.ContainsKey(newColor))
             {
                 _sprite.sprite = _colorSpriteDict[newColor];
