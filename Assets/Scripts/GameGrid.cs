@@ -235,53 +235,50 @@ namespace Match3
             if (_gameOver) { return; }
 
             if (!piece1.IsMovable() || !piece2.IsMovable()) return;
-        
+
+            // Đổi chỗ nháp trong mảng dữ liệu để kiểm tra Match
+            // Đổi chỗ nháp trong mảng dữ liệu (giữ nguyên logic cũ của bạn)
             _pieces[piece1.X, piece1.Y] = piece2;
             _pieces[piece2.X, piece2.Y] = piece1;
 
-            if (GetMatch(piece1, piece2.X, piece2.Y) != null || 
+            // 1. Tạo biến kiểm tra xem viên kẹo có phải đồ đặc biệt không
+            bool isPiece1Special = piece1.Type == PieceType.Rainbow || piece1.Type == PieceType.RowClear || piece1.Type == PieceType.ColumnClear;
+            bool isPiece2Special = piece2.Type == PieceType.Rainbow || piece2.Type == PieceType.RowClear || piece2.Type == PieceType.ColumnClear;
+
+            // 2. Cập nhật điều kiện: Nếu có Match HOẶC 1 trong 2 viên là đồ đặc biệt -> Cho phép nổ
+            if (GetMatch(piece1, piece2.X, piece2.Y) != null ||
                 GetMatch(piece2, piece1.X, piece1.Y) != null ||
-                piece1.Type == PieceType.Rainbow ||
-                piece2.Type == PieceType.Rainbow)
+                isPiece1Special ||
+                isPiece2Special)
             {
+                // TRƯỜNG HỢP ĐÚNG (CÓ MATCH HOẶC LÀ KẸO ĐẶC BIỆT)
                 int piece1X = piece1.X;
                 int piece1Y = piece1.Y;
 
                 piece1.MovableComponent.Move(piece2.X, piece2.Y, fillTime);
                 piece2.MovableComponent.Move(piece1X, piece1Y, fillTime);
 
+                // Xử lý Rainbow
                 if (piece1.Type == PieceType.Rainbow && piece1.IsClearable() && piece2.IsColored())
                 {
                     ClearColorPiece clearColor = piece1.GetComponent<ClearColorPiece>();
-
-                    if (clearColor)
-                    {
-                        clearColor.Color = piece2.ColorComponent.Color;
-                    }
-
+                    if (clearColor) { clearColor.Color = piece2.ColorComponent.Color; }
                     ClearPiece(piece1.X, piece1.Y);
                 }
-
                 if (piece2.Type == PieceType.Rainbow && piece2.IsClearable() && piece1.IsColored())
                 {
                     ClearColorPiece clearColor = piece2.GetComponent<ClearColorPiece>();
-
-                    if (clearColor)
-                    {
-                        clearColor.Color = piece1.ColorComponent.Color;
-                    }
-
+                    if (clearColor) { clearColor.Color = piece1.ColorComponent.Color; }
                     ClearPiece(piece2.X, piece2.Y);
                 }
 
                 ClearAllValidMatches();
 
-                // special pieces get cleared, event if they are not matched
+                // Xử lý nổ RowClear và ColumnClear ngay lập tức khi được vuốt
                 if (piece1.Type == PieceType.RowClear || piece1.Type == PieceType.ColumnClear)
                 {
                     ClearPiece(piece1.X, piece1.Y);
                 }
-
                 if (piece2.Type == PieceType.RowClear || piece2.Type == PieceType.ColumnClear)
                 {
                     ClearPiece(piece2.X, piece2.Y);
@@ -291,14 +288,40 @@ namespace Match3
                 _enteredPiece = null;
 
                 StartCoroutine(Fill());
-
                 level.OnMove();
             }
             else
             {
+                // TRƯỜNG HỢP SAI (ĐI QUA RỒI CHẠY VỀ BẠN VỪA LÀM Ở BƯỚC TRƯỚC)
                 _pieces[piece1.X, piece1.Y] = piece1;
                 _pieces[piece2.X, piece2.Y] = piece2;
+
+                StartCoroutine(AnimateInvalidSwap(piece1, piece2));
+
+                _pressedPiece = null;
+                _enteredPiece = null;
             }
+        }
+
+        // THÊM COROUTINE NÀY VÀO TRONG CLASS GameGrid
+        private IEnumerator AnimateInvalidSwap(GamePiece piece1, GamePiece piece2)
+        {
+            // Lưu lại tọa độ thật của 2 viên kẹo (trước khi tráo đổi)
+            int p1X = piece1.X;
+            int p1Y = piece1.Y;
+            int p2X = piece2.X;
+            int p2Y = piece2.Y;
+
+            // Bước 1: Di chuyển qua vị trí của nhau
+            piece1.MovableComponent.Move(p2X, p2Y, fillTime);
+            piece2.MovableComponent.Move(p1X, p1Y, fillTime);
+
+            // Bước 2: Chờ cho animation "đi qua" chạy xong
+            yield return new WaitForSeconds(fillTime);
+
+            // Bước 3: Di chuyển lùi về vị trí ban đầu
+            piece1.MovableComponent.Move(p1X, p1Y, fillTime);
+            piece2.MovableComponent.Move(p2X, p2Y, fillTime);
         }
 
         public void PressPiece(GamePiece piece) => _pressedPiece = piece;

@@ -6,8 +6,8 @@ namespace Match3
         Shield,
         Mana,
         Hp,
-        Thunder,
         Spell,
+        Thunder,
         Any,
         Count
     };

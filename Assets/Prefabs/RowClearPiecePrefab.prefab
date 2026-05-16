@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: b7a68c654b9c3a44c9d3df16fa71210c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bf527299a5146b84493cf1dd86b1e359, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 61163314065986320}
   - component: {fileID: 95321145490798010}
   - component: {fileID: 114325371315596282}
+  - component: {fileID: 6500195880570127957}
   m_Layer: 0
   m_Name: RowClearPiecePrefab
   m_TagString: Untagged
@@ -161,22 +162,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1685163007815210}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c25adb5f867fc24386f09962f4576ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentColor: 0
   colorSprites:
-  - color: 0
-    sprite: {fileID: 21300000, guid: e29e5c50eb44a82419421fea09be3ecc, type: 3}
-  - color: 1
-    sprite: {fileID: 21300000, guid: 1135bb60951193b48b0abe5d01de0386, type: 3}
-  - color: 2
-    sprite: {fileID: 21300000, guid: 60172776f27911d49a3eefdabe14db05, type: 3}
-  - color: 3
-    sprite: {fileID: 21300000, guid: 5883b85230b5f94418632fa1c1b1b605, type: 3}
-  - color: 0
-    sprite: {fileID: 21300000, guid: 4598661072bfa6945a5305c9a4bbb24f, type: 3}
+  - color: 5
+    sprite: {fileID: 21300000, guid: bf527299a5146b84493cf1dd86b1e359, type: 3}
 --- !u!61 &61163314065986320
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -259,3 +253,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clearAnimation: {fileID: 7400000, guid: 6a673afd418e34b498932892ee1d6fbc, type: 2}
   isRow: 1
+--- !u!114 &6500195880570127957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1685163007815210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bf54c00f7401ca47bb2e042f6d307f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::thunderpice
+  currentColor: 5
+  colorSprites:
+    color: 5
+    sprite: {fileID: 21300000, guid: bf527299a5146b84493cf1dd86b1e359, type: 3}
