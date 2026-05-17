@@ -2,37 +2,30 @@
 {
     public class LevelMoves : Level
     {
-
         public int numMoves;
-        public int targetScore;
+        public int movesUsed = 0;
 
-        private int _movesUsed = 0;
-
-        private void Start()
-        {
-            type = LevelType.Moves;
-
-            hud.SetLevelType(type);
-            hud.SetScore(currentScore);
-            hud.SetTarget(targetScore);
-            hud.SetRemaining(numMoves);
-        }
+        // ... các hàm khác ...
 
         public override void OnMove()
         {
-            _movesUsed++;
+           
+            base.OnMove();
 
-            hud.SetRemaining(numMoves - _movesUsed);
+           
+            movesUsed++;
+            hud.SetRemaining(numMoves - movesUsed);
 
-            if (numMoves - _movesUsed != 0) return;
-        
-            if (currentScore >= targetScore)
+            if (numMoves - movesUsed == 0)
             {
-                GameWin();
-            }
-            else
-            {
-                GameLose();
+                if (currentScore >= score1Star)
+                {
+                    GameWin();
+                }
+                else
+                {
+                    GameLose();
+                }
             }
         }
     }
