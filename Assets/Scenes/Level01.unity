@@ -413,7 +413,7 @@ MonoBehaviour:
   - type: 4
     prefab: {fileID: 1744477852393382, guid: e856d71a91ffb53409236526ecee4bda, type: 3}
   - type: 5
-    prefab: {fileID: 174492, guid: f6090629d79e1a34db1e37f9f517d5a2, type: 3}
+    prefab: {fileID: 1052986968358228, guid: 76cf5fcb1fcbe0f4a8673d6ce36da32c, type: 3}
   backgroundPrefab: {fileID: 126596, guid: 86f7705ed2388c64294da188eff4bc1b, type: 3}
   initialPieces: []
 --- !u!1 &606057589
@@ -594,6 +594,7 @@ MonoBehaviour:
   playerMaxHp: 100
   playerCurrentHp: 100
   playerMana: 0
+  playerMaxMana: 50
   playerShield: 0
   playerAttack: 10
   playerSp: 15
@@ -703,7 +704,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e76c7eb3de7839d4bafbba9ed0a18ec3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::enemy
-  enemyMaxHp: 200
+  enemyMaxHp: 1000
   enemyCurrentHp: 200
   enemyAttack: 15
 --- !u!4 &1439421571
@@ -757,6 +758,7 @@ MonoBehaviour:
   score3Star: 21000
   statplayer: {fileID: 625154141}
   enemy: {fileID: 1439421570}
+  rpgEffectsEnabled: 0
   numMoves: 14
   movesUsed: 0
 --- !u!4 &1773144089
