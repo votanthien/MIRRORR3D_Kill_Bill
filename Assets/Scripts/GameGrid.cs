@@ -45,6 +45,39 @@ namespace Match3
 
         public bool IsFilling { get; private set; }
 
+        private void Update()
+        {
+            if (_gameOver || IsFilling) return;
+
+            // Click chuột phải (Nút số 1)
+            if (Input.GetMouseButtonDown(1))
+            {
+                Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+
+                if (hit.collider != null)
+                {
+                    GamePiece piece = hit.collider.GetComponent<GamePiece>();
+
+                    // Nếu đúng là cục Rainbow
+                    if (piece != null && piece.Type == PieceType.Rainbow)
+                    {
+                        if (level != null)
+                        {
+                            level.rpgEffectsEnabled = true; // Kích hoạt hệ thống RPG
+                        }
+
+                        Debug.Log("⚡ [KÍCH HOẠT] Chuột phải vào Tia Sét! Chỉ nổ damage và biến mất!");
+
+                        // Chỉ xóa đúng vị trí của viên Rainbow này
+                        ClearPiece(piece.X, piece.Y);
+
+                        StartCoroutine(Fill());        // Cho kẹo mới rơi xuống điền chỗ trống
+                        level.OnMove();               // Quái quật lại (nếu có logic turn)
+                    }
+                }
+            }
+        }
         private void Awake()
         {
             // populating dictionary with piece prefabs types
@@ -92,8 +125,68 @@ namespace Match3
 
             StartCoroutine(Fill());
         }
+        // HÀM MỚI: Kiểm tra xem người chơi có vuốt gộp các cục nâng cấp (Lv2, Lv3) hay không
+        private bool CheckSpecialMerge(GamePiece piece1, GamePiece piece2)
+        {
+            // Xác định cấp độ của 2 viên kẹo được vuốt
+            bool p1_IsLv2 = (piece1.Type == PieceType.RowClear);
+            bool p2_IsLv2 = (piece2.Type == PieceType.RowClear);
+            bool p1_IsLv3 = (piece1.Type == PieceType.Lv3);
+            bool p2_IsLv3 = (piece2.Type == PieceType.Lv3);
 
-        private IEnumerator Fill()
+            // Cả hai viên phải có cấu phần màu (Cục Raw) và phải CÙNG MÀU với nhau mới gộp được
+            if (piece1.IsColored() && piece2.IsColored() && piece1.ColorComponent.Color == piece2.ColorComponent.Color)
+            {
+                ColorType targetColor = piece1.ColorComponent.Color;
+
+                // TRƯỜNG HỢP 1: Vuốt cục Lv2 vào cục Lv2 -> Tạo cục Lv3
+                if (p1_IsLv2 && p2_IsLv2)
+                {
+                    int targetX = piece2.X; // Giữ lại vị trí của viên kẹo đích
+                    int targetY = piece2.Y;
+
+                    // Xóa trực tiếp GameObject của 2 viên Lv2 cũ (không kích hoạt hàm nổ thường)
+                    DestroyPieceAt(piece1.X, piece1.Y);
+                    DestroyPieceAt(piece2.X, piece2.Y);
+
+                    // Sinh ra một viên Lv3 mới ngay tại vị trí đích và gán đúng màu cho nó
+                    GamePiece newLv3 = SpawnNewPiece(targetX, targetY, PieceType.Lv3);
+                    if (newLv3.IsColored())
+                    {
+                        newLv3.ColorComponent.Color = targetColor;
+                    }
+
+                    Debug.Log($"✨ [GỘP CẤP] Kết hợp 2 cục Lv2 thành 1 cục {targetColor} Lv3!");
+
+                    // Cập nhật lại bàn cờ (cho kẹo trên cao rơi xuống lấp chỗ trống của viên piece1)
+                    StartCoroutine(Fill());
+                    return true; // Đã xử lý đặc biệt, dừng các logic match-3 thông thường
+                }
+
+                // TRƯỜNG HỢP 2: Vuốt cục Lv2 và cục Lv3 vào nhau -> Sát thương nhân 3 diện rộng
+                if ((p1_IsLv2 && p2_IsLv3) || (p1_IsLv3 && p2_IsLv2))
+                {
+                    Debug.Log($"💥 [COMBO ĐẶC BIỆT] Kích nổ cục Lv2 + Lv3 cùng lúc! Hệ số x3!");
+
+                    // Gọi sang Level để tính sát thương nhân 3 và dọn dẹp bàn cờ
+                    level.ExecuteComboLv2Lv3(targetColor, piece1, piece2);
+                    return true;
+                }
+            }
+
+            return false; // Không phải combo gộp kẹo, tiếp tục xử lý match-3 như bình thường
+        }
+
+        // Hàm hỗ trợ xóa kẹo nhanh trên Grid mà không kích hoạt nổ dây chuyền sai logic
+        public void DestroyPieceAt(int x, int y)
+        {
+            if (_pieces[x, y] != null)
+            {
+                Destroy(_pieces[x, y].gameObject);
+                SpawnNewPiece(x, y, PieceType.Empty);
+            }
+        }
+        public IEnumerator Fill()
         {        
             bool needsRefill = true;
             IsFilling = true;
@@ -234,15 +327,28 @@ namespace Match3
         {
             if (_gameOver) { return; }
 
+            if (level != null)
+            {
+                level.rpgEffectsEnabled = true;
+            }
+
             if (!piece1.IsMovable() || !piece2.IsMovable()) return;
-        
+
+            // Vẫn giữ logic Gộp kẹo đặc biệt (Lv2 + Lv2 -> Lv3) từ bước trước của bạn
+            if (CheckSpecialMerge(piece1, piece2))
+            {
+                _pressedPiece = null;
+                _enteredPiece = null;
+                return;
+            }
+
+            // Đổi chỗ nháp trong mảng dữ liệu để kiểm tra Match
             _pieces[piece1.X, piece1.Y] = piece2;
             _pieces[piece2.X, piece2.Y] = piece1;
 
-            if (GetMatch(piece1, piece2.X, piece2.Y) != null || 
-                GetMatch(piece2, piece1.X, piece1.Y) != null ||
-                piece1.Type == PieceType.Rainbow ||
-                piece2.Type == PieceType.Rainbow)
+            // CHỈ CHO PHÉP NỔ KHI CÓ MATCH 3 TRỞ LÊN (Giống hệt kẹo Normal)
+            if (GetMatch(piece1, piece2.X, piece2.Y) != null ||
+                GetMatch(piece2, piece1.X, piece1.Y) != null)
             {
                 int piece1X = piece1.X;
                 int piece1Y = piece1.Y;
@@ -250,55 +356,46 @@ namespace Match3
                 piece1.MovableComponent.Move(piece2.X, piece2.Y, fillTime);
                 piece2.MovableComponent.Move(piece1X, piece1Y, fillTime);
 
-                if (piece1.Type == PieceType.Rainbow && piece1.IsClearable() && piece2.IsColored())
-                {
-                    ClearColorPiece clearColor = piece1.GetComponent<ClearColorPiece>();
-
-                    if (clearColor)
-                    {
-                        clearColor.Color = piece2.ColorComponent.Color;
-                    }
-
-                    ClearPiece(piece1.X, piece1.Y);
-                }
-
-                if (piece2.Type == PieceType.Rainbow && piece2.IsClearable() && piece1.IsColored())
-                {
-                    ClearColorPiece clearColor = piece2.GetComponent<ClearColorPiece>();
-
-                    if (clearColor)
-                    {
-                        clearColor.Color = piece1.ColorComponent.Color;
-                    }
-
-                    ClearPiece(piece2.X, piece2.Y);
-                }
-
                 ClearAllValidMatches();
-
-                // special pieces get cleared, event if they are not matched
-                if (piece1.Type == PieceType.RowClear || piece1.Type == PieceType.ColumnClear)
-                {
-                    ClearPiece(piece1.X, piece1.Y);
-                }
-
-                if (piece2.Type == PieceType.RowClear || piece2.Type == PieceType.ColumnClear)
-                {
-                    ClearPiece(piece2.X, piece2.Y);
-                }
 
                 _pressedPiece = null;
                 _enteredPiece = null;
 
                 StartCoroutine(Fill());
-
                 level.OnMove();
             }
             else
             {
+                // Nếu không tạo thành hàng 3 -> Đi qua rồi chạy về vị trí cũ
                 _pieces[piece1.X, piece1.Y] = piece1;
                 _pieces[piece2.X, piece2.Y] = piece2;
+
+                StartCoroutine(AnimateInvalidSwap(piece1, piece2));
+
+                _pressedPiece = null;
+                _enteredPiece = null;
             }
+        }
+
+        // THÊM COROUTINE NÀY VÀO TRONG CLASS GameGrid
+        private IEnumerator AnimateInvalidSwap(GamePiece piece1, GamePiece piece2)
+        {
+            // Lưu lại tọa độ thật của 2 viên kẹo (trước khi tráo đổi)
+            int p1X = piece1.X;
+            int p1Y = piece1.Y;
+            int p2X = piece2.X;
+            int p2Y = piece2.Y;
+
+            // Bước 1: Di chuyển qua vị trí của nhau
+            piece1.MovableComponent.Move(p2X, p2Y, fillTime);
+            piece2.MovableComponent.Move(p1X, p1Y, fillTime);
+
+            // Bước 2: Chờ cho animation "đi qua" chạy xong
+            yield return new WaitForSeconds(fillTime);
+
+            // Bước 3: Di chuyển lùi về vị trí ban đầu
+            piece1.MovableComponent.Move(p1X, p1Y, fillTime);
+            piece2.MovableComponent.Move(p2X, p2Y, fillTime);
         }
 
         public void PressPiece(GamePiece piece) => _pressedPiece = piece;
@@ -586,14 +683,20 @@ namespace Match3
         private bool ClearPiece(int x, int y)
         {
             if (!_pieces[x, y].IsClearable() || _pieces[x, y].ClearableComponent.IsBeingCleared) return false;
-        
+
+            // --- THÊM MỚI: Báo cho hệ thống Level biết viên kẹo này nổ để tính sát thương/tia sét ---
+            if (level != null)
+            {
+                level.OnPieceCleared(_pieces[x, y]);
+            }
+            // ---------------------------------------------------------------------------------------
+
             _pieces[x, y].ClearableComponent.Clear();
             SpawnNewPiece(x, y, PieceType.Empty);
 
             ClearObstacles(x, y);
 
             return true;
-
         }
 
         private void ClearObstacles(int x, int y)
