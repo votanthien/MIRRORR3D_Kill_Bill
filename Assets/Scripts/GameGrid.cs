@@ -92,8 +92,68 @@ namespace Match3
 
             StartCoroutine(Fill());
         }
+        // HÀM MỚI: Kiểm tra xem người chơi có vuốt gộp các cục nâng cấp (Lv2, Lv3) hay không
+        private bool CheckSpecialMerge(GamePiece piece1, GamePiece piece2)
+        {
+            // Xác định cấp độ của 2 viên kẹo được vuốt
+            bool p1_IsLv2 = (piece1.Type == PieceType.RowClear);
+            bool p2_IsLv2 = (piece2.Type == PieceType.RowClear);
+            bool p1_IsLv3 = (piece1.Type == PieceType.Lv3);
+            bool p2_IsLv3 = (piece2.Type == PieceType.Lv3);
 
-        private IEnumerator Fill()
+            // Cả hai viên phải có cấu phần màu (Cục Raw) và phải CÙNG MÀU với nhau mới gộp được
+            if (piece1.IsColored() && piece2.IsColored() && piece1.ColorComponent.Color == piece2.ColorComponent.Color)
+            {
+                ColorType targetColor = piece1.ColorComponent.Color;
+
+                // TRƯỜNG HỢP 1: Vuốt cục Lv2 vào cục Lv2 -> Tạo cục Lv3
+                if (p1_IsLv2 && p2_IsLv2)
+                {
+                    int targetX = piece2.X; // Giữ lại vị trí của viên kẹo đích
+                    int targetY = piece2.Y;
+
+                    // Xóa trực tiếp GameObject của 2 viên Lv2 cũ (không kích hoạt hàm nổ thường)
+                    DestroyPieceAt(piece1.X, piece1.Y);
+                    DestroyPieceAt(piece2.X, piece2.Y);
+
+                    // Sinh ra một viên Lv3 mới ngay tại vị trí đích và gán đúng màu cho nó
+                    GamePiece newLv3 = SpawnNewPiece(targetX, targetY, PieceType.Lv3);
+                    if (newLv3.IsColored())
+                    {
+                        newLv3.ColorComponent.Color = targetColor;
+                    }
+
+                    Debug.Log($"✨ [GỘP CẤP] Kết hợp 2 cục Lv2 thành 1 cục {targetColor} Lv3!");
+
+                    // Cập nhật lại bàn cờ (cho kẹo trên cao rơi xuống lấp chỗ trống của viên piece1)
+                    StartCoroutine(Fill());
+                    return true; // Đã xử lý đặc biệt, dừng các logic match-3 thông thường
+                }
+
+                // TRƯỜNG HỢP 2: Vuốt cục Lv2 và cục Lv3 vào nhau -> Sát thương nhân 3 diện rộng
+                if ((p1_IsLv2 && p2_IsLv3) || (p1_IsLv3 && p2_IsLv2))
+                {
+                    Debug.Log($"💥 [COMBO ĐẶC BIỆT] Kích nổ cục Lv2 + Lv3 cùng lúc! Hệ số x3!");
+
+                    // Gọi sang Level để tính sát thương nhân 3 và dọn dẹp bàn cờ
+                    level.ExecuteComboLv2Lv3(targetColor, piece1, piece2);
+                    return true;
+                }
+            }
+
+            return false; // Không phải combo gộp kẹo, tiếp tục xử lý match-3 như bình thường
+        }
+
+        // Hàm hỗ trợ xóa kẹo nhanh trên Grid mà không kích hoạt nổ dây chuyền sai logic
+        public void DestroyPieceAt(int x, int y)
+        {
+            if (_pieces[x, y] != null)
+            {
+                Destroy(_pieces[x, y].gameObject);
+                SpawnNewPiece(x, y, PieceType.Empty);
+            }
+        }
+        public IEnumerator Fill()
         {        
             bool needsRefill = true;
             IsFilling = true;
@@ -236,14 +296,24 @@ namespace Match3
 
             if (!piece1.IsMovable() || !piece2.IsMovable()) return;
 
-            // Đổi chỗ nháp trong mảng dữ liệu để kiểm tra Match
-            // Đổi chỗ nháp trong mảng dữ liệu (giữ nguyên logic cũ của bạn)
+            // =========================================================================
+            // THÊM MỚI: BẮT SỰ KIỆN GỘP KẸO (LV2 + LV2 -> LV3) HOẶC (LV2 + LV3 -> COMBO)
+            // =========================================================================
+            if (CheckSpecialMerge(piece1, piece2))
+            {
+                // Nếu đã xử lý gộp kẹo thành công, dừng lại, không chạy logic nổ bình thường phía dưới nữa
+                _pressedPiece = null;
+                _enteredPiece = null;
+                return;
+            }
+
+            // Đổi chỗ nháp trong mảng dữ liệu để kiểm tra Match (giữ nguyên logic cũ)
             _pieces[piece1.X, piece1.Y] = piece2;
             _pieces[piece2.X, piece2.Y] = piece1;
 
-            // 1. Tạo biến kiểm tra xem viên kẹo có phải đồ đặc biệt không
-            bool isPiece1Special = piece1.Type == PieceType.Rainbow || piece1.Type == PieceType.RowClear || piece1.Type == PieceType.ColumnClear;
-            bool isPiece2Special = piece2.Type == PieceType.Rainbow || piece2.Type == PieceType.RowClear || piece2.Type == PieceType.ColumnClear;
+            // 1. Tạo biến kiểm tra xem viên kẹo có phải đồ đặc biệt không (CẬP NHẬT THÊM LV3)
+            bool isPiece1Special = piece1.Type == PieceType.Rainbow || piece1.Type == PieceType.RowClear || piece1.Type == PieceType.ColumnClear || piece1.Type == PieceType.Lv3;
+            bool isPiece2Special = piece2.Type == PieceType.Rainbow || piece2.Type == PieceType.RowClear || piece2.Type == PieceType.ColumnClear || piece2.Type == PieceType.Lv3;
 
             // 2. Cập nhật điều kiện: Nếu có Match HOẶC 1 trong 2 viên là đồ đặc biệt -> Cho phép nổ
             if (GetMatch(piece1, piece2.X, piece2.Y) != null ||
@@ -258,7 +328,7 @@ namespace Match3
                 piece1.MovableComponent.Move(piece2.X, piece2.Y, fillTime);
                 piece2.MovableComponent.Move(piece1X, piece1Y, fillTime);
 
-                // Xử lý Rainbow
+                // Xử lý Rainbow (Sét giáng)
                 if (piece1.Type == PieceType.Rainbow && piece1.IsClearable() && piece2.IsColored())
                 {
                     ClearColorPiece clearColor = piece1.GetComponent<ClearColorPiece>();
@@ -274,12 +344,12 @@ namespace Match3
 
                 ClearAllValidMatches();
 
-                // Xử lý nổ RowClear và ColumnClear ngay lập tức khi được vuốt
-                if (piece1.Type == PieceType.RowClear || piece1.Type == PieceType.ColumnClear)
+                // Xử lý nổ kẹo đặc biệt ngay lập tức khi được vuốt (CẬP NHẬT THÊM LV3)
+                if (piece1.Type == PieceType.RowClear || piece1.Type == PieceType.ColumnClear || piece1.Type == PieceType.Lv3)
                 {
                     ClearPiece(piece1.X, piece1.Y);
                 }
-                if (piece2.Type == PieceType.RowClear || piece2.Type == PieceType.ColumnClear)
+                if (piece2.Type == PieceType.RowClear || piece2.Type == PieceType.ColumnClear || piece2.Type == PieceType.Lv3)
                 {
                     ClearPiece(piece2.X, piece2.Y);
                 }
@@ -292,7 +362,7 @@ namespace Match3
             }
             else
             {
-                // TRƯỜNG HỢP SAI (ĐI QUA RỒI CHẠY VỀ BẠN VỪA LÀM Ở BƯỚC TRƯỚC)
+                // TRƯỜNG HỢP SAI (ĐI QUA RỒI CHẠY VỀ)
                 _pieces[piece1.X, piece1.Y] = piece1;
                 _pieces[piece2.X, piece2.Y] = piece2;
 

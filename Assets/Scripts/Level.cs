@@ -66,6 +66,39 @@ namespace Match3
             currentScore += piece.score;
             hud.SetScore(currentScore);
 
+            // =========================================================
+            // 1. LOGIC TIA SÉT (ĐỘC LẬP - KHÔNG LIÊN QUAN ĐẾN CỤC RAW)
+            // =========================================================
+            // ColumnClear và Rainbow giờ được tính chung là Tia Sét
+            if (piece.Type == PieceType.Rainbow)
+            {
+                int lightningDamage = statplayer.playerSp * 2; // Ví dụ sát thương của tia sét
+                enemy.enemyCurrentHp -= lightningDamage;
+
+                Debug.Log($"⚡ TIA SÉT đánh trúng! Gây {lightningDamage} Sát thương lên quái!");
+                CheckBattleStatus();
+
+                // Tia sét nổ xong thì thoát hàm, không xử lý phần Cục Raw ở dưới nữa
+                return;
+            }
+
+            // =========================================================
+            // 2. LOGIC CỦA CỤC RAW THÔNG THƯỜNG (KIỂM TRA LV2, LV3)
+            // =========================================================
+            int multiplier = 1; // Cục Raw bình thường hệ số là 1
+
+            if (piece.Type == PieceType.RowClear || piece.Type == PieceType.ColumnClear )
+            {
+                // Dùng RowClear làm đại diện cho cục Raw Lv2
+                multiplier = 2;
+            }
+            // Giả sử bạn thêm PieceType.Lv3 vào code
+            /* else if (piece.Type == PieceType.Lv3) 
+            {
+                multiplier = 4; // Cục Raw Lv3 nhân 4 theo đúng thiết kế của bạn
+            } */
+
+            // Xử lý chỉ số dựa theo Màu của Cục Raw và nhân với Hệ số (Lv)
             if (piece.IsColored())
             {
                 ColorType colorType = piece.ColorComponent.Color;
@@ -73,34 +106,37 @@ namespace Match3
                 switch (colorType)
                 {
                     case ColorType.Sword:
-                        enemy.enemyCurrentHp -= statplayer.playerAttack;
-                        Debug.Log($"🗡️ Bạn chém Sword! Máu địch còn: {enemy.enemyCurrentHp}/{enemy.enemyMaxHp}");
+                        int damage = statplayer.playerAttack * multiplier;
+                        enemy.enemyCurrentHp -= damage;
+                        Debug.Log($"🗡️ Sword [Lv{multiplier}]! Gây {damage} Sát thương!");
                         break;
 
                     case ColorType.Shield:
-                        statplayer.playerShield = Mathf.Min(statplayer.playerShield + 1, 2);
-                        Debug.Log($"🛡️ Bạn buff Shield! Khiên hiện tại: {statplayer.playerShield}/2");
+                        statplayer.playerShield = Mathf.Min(statplayer.playerShield + (1 * multiplier), 2);
+                        Debug.Log($"🛡️ Shield [Lv{multiplier}]! Hồi {1 * multiplier} Khiên!");
                         break;
 
                     case ColorType.Mana:
-                        statplayer.playerMana += 5;
-                        Debug.Log($"🔵 Bạn hồi Mana! Năng lượng: {statplayer.playerMana}");
+                        int manaRestore = 5 * multiplier;
+                        statplayer.playerMana = Mathf.Min(statplayer.playerMana + manaRestore, statplayer.playerMaxMana);
+                        Debug.Log($"🔵 Mana [Lv{multiplier}]! Hồi {manaRestore} Năng lượng!");
                         break;
 
                     case ColorType.Hp:
-                        statplayer.playerCurrentHp = Mathf.Min(statplayer.playerCurrentHp + 10, statplayer.playerMaxHp);
-                        Debug.Log($"❤️ Bạn hồi HP! Máu của bạn: {statplayer.playerCurrentHp}/{statplayer.playerMaxHp}");
+                        int hpRestore = 10 * multiplier;
+                        statplayer.playerCurrentHp = Mathf.Min(statplayer.playerCurrentHp + hpRestore, statplayer.playerMaxHp);
+                        Debug.Log($"❤️ HP [Lv{multiplier}]! Hồi {hpRestore} Máu!");
                         break;
 
                     case ColorType.Spell:
-                        enemy.enemyCurrentHp -= statplayer.playerSp;
-                        Debug.Log($"✨ Bạn tung Spell! Máu địch còn: {enemy.enemyCurrentHp}/{enemy.enemyMaxHp}");
+                        int spellDamage = statplayer.playerSp * multiplier;
+                        enemy.enemyCurrentHp -= spellDamage;
+                        Debug.Log($"✨ Spell [Lv{multiplier}]! Gây {spellDamage} Sát thương phép!");
                         break;
                 }
-
-                // Kiểm tra ngay xem quái có chết sau chuỗi ăn kẹo này không
-                CheckBattleStatus();
             }
+
+            CheckBattleStatus();
         }
 
         // COROUTINE XỬ LÝ LƯỢT CỦA QUÁI VẬT
@@ -167,6 +203,57 @@ namespace Match3
             {
                 hud.OnGameLose();
             }
+        }
+        // Hàm hỗ trợ tính toán sát thương/hiệu ứng dựa trên Màu và Hệ số nhân
+        public void ApplyRawDamage(ColorType colorType, int multiplier)
+        {
+            switch (colorType)
+            {
+                case ColorType.Sword:
+                    int damage = statplayer.playerAttack * multiplier;
+                    enemy.enemyCurrentHp -= damage;
+                    Debug.Log($"🗡️ Sword Combo! Gây {damage} Sát thương vật lý! (Hệ số x{multiplier})");
+                    break;
+
+                case ColorType.Shield:
+                    statplayer.playerShield = Mathf.Min(statplayer.playerShield + (1 * multiplier), 2);
+                    Debug.Log($"🛡️ Shield Combo! Hồi {1 * multiplier} Khiên! (Hệ số x{multiplier})");
+                    break;
+
+                case ColorType.Mana:
+                    int manaRestore = 5 * multiplier;
+                    statplayer.playerMana = Mathf.Min(statplayer.playerMana + manaRestore, statplayer.playerMaxMana);
+                    Debug.Log($"🔵 Mana Combo! Hồi {manaRestore} Năng lượng! (Hệ số x{multiplier})");
+                    break;
+
+                case ColorType.Hp:
+                    int hpRestore = 10 * multiplier;
+                    statplayer.playerCurrentHp = Mathf.Min(statplayer.playerCurrentHp + hpRestore, statplayer.playerMaxHp);
+                    Debug.Log($"❤️ HP Combo! Hồi {hpRestore} Máu! (Hệ số x{multiplier})");
+                    break;
+
+                case ColorType.Spell:
+                    int spellDamage = statplayer.playerSp * multiplier;
+                    enemy.enemyCurrentHp -= spellDamage;
+                    Debug.Log($"✨ Spell Combo! Gây {spellDamage} Sát thương phép! (Hệ số x{multiplier})");
+                    break;
+            }
+        }
+
+        // HÀM MỚI: Xử lý khi người chơi vuốt cục Lv2 và Lv3 cùng lúc (Nhân 3)
+        public void ExecuteComboLv2Lv3(ColorType color, GamePiece p1, GamePiece p2)
+        {
+            if (_isGameOver) return;
+
+            // Kích hoạt sát thương hệ số 3
+            ApplyRawDamage(color, 3);
+
+            // Xóa 2 viên kẹo này khỏi bàn cờ
+            p1.GameGridRef.DestroyPieceAt(p1.X, p1.Y);
+            p2.GameGridRef.DestroyPieceAt(p2.X, p2.Y);
+
+            CheckBattleStatus();
+            StartCoroutine(p1.GameGridRef.Fill());
         }
     }
 }
