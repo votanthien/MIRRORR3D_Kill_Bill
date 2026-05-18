@@ -21,7 +21,7 @@ namespace Match3
         protected int currentScore;
         private bool _didWin;
         private bool _isGameOver;
-
+        private int _currentFrameShieldMultiplier = 0; // Dùng để gom cụm kẹo Khiên nổ cùng lúc
         private void Start()
         {
             hud.SetScore(currentScore);
@@ -33,8 +33,80 @@ namespace Match3
         }
 
         public LevelType Type => type;
+        // 1. Thêm biến này vào cùng cụm nhóm trạng thái (ở gần các biến _isGameOver)
+        public bool rpgEffectsEnabled = false;
 
-        protected virtual void GameWin()
+        // 2. Sửa lại hàm OnPieceCleared một chút ở đoạn giữa
+        public virtual void OnPieceCleared(GamePiece piece)
+        {
+            if (_isGameOver) return;
+
+            currentScore += piece.score;
+            hud.SetScore(currentScore);
+
+            if (!rpgEffectsEnabled) return;
+
+            // ==========================================
+            // 1. TIA SÉT (Chỉ dành cho Rainbow)
+            // ==========================================
+            if (piece.Type == PieceType.Rainbow)
+            {
+                int lightningDamage = statplayer.playerSp * 2;
+                enemy.enemyCurrentHp -= lightningDamage;
+
+                Debug.Log($"⚡ TIA SÉT đánh trúng! Gây {lightningDamage} Sát thương lên quái!");
+                CheckBattleStatus();
+                return;
+            }
+
+            // ==========================================
+            // 2. CỤC RAW & HỆ SỐ NHÂN (Lv2, Lv3)
+            // ==========================================
+            int multiplier = 1;
+
+            if (piece.Type == PieceType.RowClear || piece.Type == PieceType.ColumnClear)
+            {
+                multiplier = 2;
+            }
+            else if (piece.Type == PieceType.Lv3)
+            {
+                multiplier = 4;
+            }
+
+            if (piece.IsColored())
+            {
+                ColorType colorType = piece.ColorComponent.Color;
+
+                // ---------------------------------------------------------------------
+                // XỬ LÝ RIÊNG CHO KHIÊN: Gom cả hàng 3 lại để chỉ tính 1 lần
+                // ---------------------------------------------------------------------
+                if (colorType == ColorType.Shield)
+                {
+                    if (_currentFrameShieldMultiplier == 0)
+                    {
+                        // Kích hoạt bộ đếm thời gian chờ cả hàng nổ xong ở cuối khung hình
+                        StartCoroutine(ApplyShieldAtEndOfFrame());
+                    }
+                    // Lấy hệ số nhân lớn nhất trong các viên vừa nổ (nếu có cục Lv2 hoặc Lv3 ở trong hàng)
+                    if (multiplier > _currentFrameShieldMultiplier)
+                    {
+                        _currentFrameShieldMultiplier = multiplier;
+                    }
+                }
+                else
+                {
+                    // Kiếm, HP, Mana, Spell vẫn giữ nguyên (nổ viên nào tính sát thương viên đó)
+                    ApplyRawDamage(colorType, multiplier);
+                }
+            }
+
+            CheckBattleStatus();
+        }
+
+      
+    
+
+protected virtual void GameWin()
         {
             _isGameOver = true;
             gameGrid.GameOver();
@@ -59,85 +131,9 @@ namespace Match3
             StartCoroutine(EnemyTurnCoroutine());
         }
 
-        public virtual void OnPieceCleared(GamePiece piece)
-        {
-            if (_isGameOver) return;
+       
 
-            currentScore += piece.score;
-            hud.SetScore(currentScore);
-
-            // =========================================================
-            // 1. LOGIC TIA SÉT (ĐỘC LẬP - KHÔNG LIÊN QUAN ĐẾN CỤC RAW)
-            // =========================================================
-            // ColumnClear và Rainbow giờ được tính chung là Tia Sét
-            if (piece.Type == PieceType.Rainbow)
-            {
-                int lightningDamage = statplayer.playerSp * 2; // Ví dụ sát thương của tia sét
-                enemy.enemyCurrentHp -= lightningDamage;
-
-                Debug.Log($"⚡ TIA SÉT đánh trúng! Gây {lightningDamage} Sát thương lên quái!");
-                CheckBattleStatus();
-
-                // Tia sét nổ xong thì thoát hàm, không xử lý phần Cục Raw ở dưới nữa
-                return;
-            }
-
-            // =========================================================
-            // 2. LOGIC CỦA CỤC RAW THÔNG THƯỜNG (KIỂM TRA LV2, LV3)
-            // =========================================================
-            int multiplier = 1; // Cục Raw bình thường hệ số là 1
-
-            if (piece.Type == PieceType.RowClear || piece.Type == PieceType.ColumnClear )
-            {
-                // Dùng RowClear làm đại diện cho cục Raw Lv2
-                multiplier = 2;
-            }
-            // Giả sử bạn thêm PieceType.Lv3 vào code
-            /* else if (piece.Type == PieceType.Lv3) 
-            {
-                multiplier = 4; // Cục Raw Lv3 nhân 4 theo đúng thiết kế của bạn
-            } */
-
-            // Xử lý chỉ số dựa theo Màu của Cục Raw và nhân với Hệ số (Lv)
-            if (piece.IsColored())
-            {
-                ColorType colorType = piece.ColorComponent.Color;
-
-                switch (colorType)
-                {
-                    case ColorType.Sword:
-                        int damage = statplayer.playerAttack * multiplier;
-                        enemy.enemyCurrentHp -= damage;
-                        Debug.Log($"🗡️ Sword [Lv{multiplier}]! Gây {damage} Sát thương!");
-                        break;
-
-                    case ColorType.Shield:
-                        statplayer.playerShield = Mathf.Min(statplayer.playerShield + (1 * multiplier), 2);
-                        Debug.Log($"🛡️ Shield [Lv{multiplier}]! Hồi {1 * multiplier} Khiên!");
-                        break;
-
-                    case ColorType.Mana:
-                        int manaRestore = 5 * multiplier;
-                        statplayer.playerMana = Mathf.Min(statplayer.playerMana + manaRestore, statplayer.playerMaxMana);
-                        Debug.Log($"🔵 Mana [Lv{multiplier}]! Hồi {manaRestore} Năng lượng!");
-                        break;
-
-                    case ColorType.Hp:
-                        int hpRestore = 10 * multiplier;
-                        statplayer.playerCurrentHp = Mathf.Min(statplayer.playerCurrentHp + hpRestore, statplayer.playerMaxHp);
-                        Debug.Log($"❤️ HP [Lv{multiplier}]! Hồi {hpRestore} Máu!");
-                        break;
-
-                    case ColorType.Spell:
-                        int spellDamage = statplayer.playerSp * multiplier;
-                        enemy.enemyCurrentHp -= spellDamage;
-                        Debug.Log($"✨ Spell [Lv{multiplier}]! Gây {spellDamage} Sát thương phép!");
-                        break;
-                }
-            }
-
-            CheckBattleStatus();
-        }
+         
 
         // COROUTINE XỬ LÝ LƯỢT CỦA QUÁI VẬT
         private IEnumerator EnemyTurnCoroutine()
@@ -212,34 +208,46 @@ namespace Match3
                 case ColorType.Sword:
                     int damage = statplayer.playerAttack * multiplier;
                     enemy.enemyCurrentHp -= damage;
-                    Debug.Log($"🗡️ Sword Combo! Gây {damage} Sát thương vật lý! (Hệ số x{multiplier})");
+                    Debug.Log($"🗡️ Sword! Gây {damage} Sát thương! (x{multiplier})");
                     break;
 
-                case ColorType.Shield:
-                    statplayer.playerShield = Mathf.Min(statplayer.playerShield + (1 * multiplier), 2);
-                    Debug.Log($"🛡️ Shield Combo! Hồi {1 * multiplier} Khiên! (Hệ số x{multiplier})");
-                    break;
-
-                case ColorType.Mana:
+                case ColorType.Mana: // <-- Đã sửa: Trả lại đúng case Mana và bỏ chữ private lỗi
                     int manaRestore = 5 * multiplier;
                     statplayer.playerMana = Mathf.Min(statplayer.playerMana + manaRestore, statplayer.playerMaxMana);
-                    Debug.Log($"🔵 Mana Combo! Hồi {manaRestore} Năng lượng! (Hệ số x{multiplier})");
+                    Debug.Log($"🔵 Mana! Hồi {manaRestore} Năng lượng! (x{multiplier})");
                     break;
 
                 case ColorType.Hp:
                     int hpRestore = 10 * multiplier;
                     statplayer.playerCurrentHp = Mathf.Min(statplayer.playerCurrentHp + hpRestore, statplayer.playerMaxHp);
-                    Debug.Log($"❤️ HP Combo! Hồi {hpRestore} Máu! (Hệ số x{multiplier})");
+                    Debug.Log($"❤️ HP! Hồi {hpRestore} Máu! (x{multiplier})");
                     break;
 
                 case ColorType.Spell:
                     int spellDamage = statplayer.playerSp * multiplier;
                     enemy.enemyCurrentHp -= spellDamage;
-                    Debug.Log($"✨ Spell Combo! Gây {spellDamage} Sát thương phép! (Hệ số x{multiplier})");
+                    Debug.Log($"✨ Spell! Gây {spellDamage} Sát thương phép! (x{multiplier})");
                     break;
             }
         }
+        private IEnumerator ApplyShieldAtEndOfFrame()
+        {
+            // Đợi đến cuối khung hình khi toàn bộ các viên kẹo trong hàng 3 đã nổ xong xuôi
+            yield return new WaitForEndOfFrame();
 
+            if (_currentFrameShieldMultiplier > 0)
+            {
+                // Chỉ cộng khiên DUY NHẤT 1 LẦN cho cả cụm kẹo vừa biến mất
+                int shieldGain = 1 * _currentFrameShieldMultiplier;
+                statplayer.playerShield = Mathf.Min(statplayer.playerShield + shieldGain, 2);
+
+                Debug.Log($"🛡️ SHIELD: Cả cụm kẹo nổ giúp hồi {shieldGain} Khiên! (Khiên hiện tại: {statplayer.playerShield}/2)");
+
+                // Reset lại biến để chuẩn bị cho lượt đi/combo tiếp theo
+                _currentFrameShieldMultiplier = 0;
+                CheckBattleStatus();
+            }
+        }
         // HÀM MỚI: Xử lý khi người chơi vuốt cục Lv2 và Lv3 cùng lúc (Nhân 3)
         public void ExecuteComboLv2Lv3(ColorType color, GamePiece p1, GamePiece p2)
         {
