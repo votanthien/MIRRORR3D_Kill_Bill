@@ -572,6 +572,7 @@ GameObject:
   m_Component:
   - component: {fileID: 625154142}
   - component: {fileID: 625154141}
+  - component: {fileID: 625154143}
   m_Layer: 0
   m_Name: player
   m_TagString: Untagged
@@ -613,6 +614,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &625154143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 625154140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd0fd0d5de0d65a448d02dc244710374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::skill
+  levelRef: {fileID: 1773144088}
+  PlayerStat: {fileID: 625154141}
 --- !u!1001 &1235525897
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -753,6 +768,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameGrid: {fileID: 581336197}
   hud: {fileID: 97316481}
+  playerSkillRef: {fileID: 625154143}
   score1Star: 15000
   score2Star: 18000
   score3Star: 21000
@@ -788,7 +804,7 @@ SceneRoots:
   - {fileID: 606057594}
   - {fileID: 581336196}
   - {fileID: 455804010}
-  - {fileID: 1773144089}
   - {fileID: 97316480}
+  - {fileID: 1773144089}
   - {fileID: 625154142}
   - {fileID: 1439421571}
