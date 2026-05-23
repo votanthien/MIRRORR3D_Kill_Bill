@@ -1740,7 +1740,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e76c7eb3de7839d4bafbba9ed0a18ec3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::enemy
-  enemyMaxHp: 1000
+  enemyMaxHp: 10000
   enemyCurrentHp: 200
   enemyAttack: 15
   hpSlider: {fileID: 2114268728}
