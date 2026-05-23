@@ -22,6 +22,15 @@ public class skill : MonoBehaviour
 
     private int defenseCooldown = 0;
     private const int MAX_DEFENSE_CD = 3;
+
+    private int heavenShieldCooldown = 0;
+    private const int MAX_HEAVEN_CD = 3;
+
+    private int wrathCooldown = 0;
+    private const int MAX_WRATH_CD = 3;
+
+    private int seeTheSoulCooldown = 0;
+    private const int MAX_SOUL_CD = 3;
     void Update()
     {
         // Khi nhấn phím K
@@ -76,7 +85,37 @@ public class skill : MonoBehaviour
             }
             defense_stance();
             PlayerStat.playerMana -= 20;
-        }    
+        }
+        if (Input.GetKeyDown(KeyCode.P) && PlayerStat.playerMana >= 20)
+        {
+            if (heavenShieldCooldown > 0)
+            {
+                Debug.LogWarning($"⏳ Khiên Thiên Đường đang hồi chiêu! Chờ {heavenShieldCooldown} lượt.");
+                return;
+            }
+            heaven_shield();
+            PlayerStat.playerMana -= 20;
+        }
+        if (Input.GetKeyDown(KeyCode.M) && PlayerStat.playerMana >= 30)
+        {
+            if (wrathCooldown > 0)
+            {
+                Debug.LogWarning($"⏳ Cơn Thịnh Nộ đang hồi chiêu! Chờ {wrathCooldown} lượt.");
+                return;
+            }
+            the_wrath();
+            PlayerStat.playerMana -= 30;
+        }
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            if (seeTheSoulCooldown > 0 && PlayerStat.playerMana >= 30)
+            {
+                Debug.LogWarning($"⏳ See The Soul đang hồi chiêu! Chờ {seeTheSoulCooldown} lượt.");
+                return;
+            }
+            see_the_soul();
+            PlayerStat.playerMana -= 30;
+        }
     }
 
     public void poision_knives()
@@ -150,6 +189,42 @@ public class skill : MonoBehaviour
         }
     }
     // 🎯 HÀM THÊM MỚI: Sẽ được gọi từ Level.cs khi người chơi kết thúc 1 lượt đi để giảm hồi chiêu
+    public void heaven_shield()
+    {
+        if (levelRef != null)
+        {
+            levelRef.rpgEffectsEnabled = true;
+
+            levelRef.ActivateHeavenShield();
+
+            heavenShieldCooldown = MAX_HEAVEN_CD;
+            Debug.Log($"😇 Skill Khiên Thiên Đường đã dùng! Cooldown: {heavenShieldCooldown} lượt.");
+        }
+    }
+    public void the_wrath()
+    {
+        if (levelRef != null)
+        {
+            levelRef.rpgEffectsEnabled = true;
+
+            levelRef.ActivateTheWrath();
+
+            wrathCooldown = MAX_WRATH_CD;
+            Debug.Log($"🔥 Skill The Wrath đã dùng! Cooldown: {wrathCooldown} lượt.");
+        }
+    }
+    public void see_the_soul()
+    {
+        if (levelRef != null)
+        {
+            levelRef.rpgEffectsEnabled = true;
+
+            levelRef.ActivateSeeTheSoul();
+
+            seeTheSoulCooldown = MAX_SOUL_CD;
+            Debug.Log($"👁️ Skill See The Soul đã dùng! Cooldown: {seeTheSoulCooldown} lượt.");
+        }
+    }
     public void ReduceCooldown()
     {
         if (poisonKnivesCooldown > 0)
@@ -190,6 +265,21 @@ public class skill : MonoBehaviour
         {
             defenseCooldown--;
             if (defenseCooldown == 0) Debug.Log("✨ Thế Thủ đã hồi xong!");
+        }
+        if (heavenShieldCooldown > 0)
+        {
+            heavenShieldCooldown--;
+            if (heavenShieldCooldown == 0) Debug.Log("✨ Khiên Thiên Đường đã hồi xong!");
+        }
+        if (wrathCooldown > 0)
+        {
+            wrathCooldown--;
+            if (wrathCooldown == 0) Debug.Log("✨ Cơn Thịnh Nộ đã hồi xong!");
+        }
+        if (seeTheSoulCooldown > 0)
+        {
+            seeTheSoulCooldown--;
+            if (seeTheSoulCooldown == 0) Debug.Log("✨ See The Soul đã hồi xong!");
         }
     }
 }

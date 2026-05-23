@@ -8,14 +8,6 @@
         {
             base.Clear();
 
-            if (isRow)
-            {            
-                piece.GameGridRef.ClearRow(piece.Y);
-            }
-            else
-            {            
-                piece.GameGridRef.ClearColumn(piece.X);
-            }
         }
     }
 }

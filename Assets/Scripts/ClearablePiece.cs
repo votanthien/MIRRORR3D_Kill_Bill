@@ -18,8 +18,19 @@ namespace Match3
 
         public virtual void Clear()
         {
-            piece.GameGridRef.level.OnPieceCleared(piece);
+            // --- THÊM DÒNG NÀY ---
+            // Nếu kẹo đang trong quá trình nổ rồi thì chặn lại, không cho chạy tiếp để tránh gọi điểm 2 lần!
+            if (IsBeingCleared)
+            {
+                return;
+            }
+
+            // Đánh dấu là kẹo bắt đầu nổ
             IsBeingCleared = true;
+
+            // Báo điểm sang Level (Đảm bảo giờ chỉ bị gọi 1 lần duy nhất cho mỗi viên kẹo)
+            piece.GameGridRef.level.OnPieceCleared(piece);
+
             StartCoroutine(ClearCoroutine());
         }
 

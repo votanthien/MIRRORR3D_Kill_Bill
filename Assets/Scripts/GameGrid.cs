@@ -684,12 +684,7 @@ namespace Match3
         {
             if (!_pieces[x, y].IsClearable() || _pieces[x, y].ClearableComponent.IsBeingCleared) return false;
 
-            // --- THÊM MỚI: Báo cho hệ thống Level biết viên kẹo này nổ để tính sát thương/tia sét ---
-            if (level != null)
-            {
-                level.OnPieceCleared(_pieces[x, y]);
-            }
-            // ---------------------------------------------------------------------------------------
+            
 
             _pieces[x, y].ClearableComponent.Clear();
             SpawnNewPiece(x, y, PieceType.Empty);
@@ -698,7 +693,6 @@ namespace Match3
 
             return true;
         }
-
         private void ClearObstacles(int x, int y)
         {
             for (int adjacentX = x - 1; adjacentX <= x + 1; adjacentX++)
