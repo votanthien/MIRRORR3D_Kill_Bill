@@ -170,15 +170,15 @@ MonoBehaviour:
   currentColor: 0
   colorSprites:
   - color: 0
-    sprite: {fileID: 21300000, guid: 4598661072bfa6945a5305c9a4bbb24f, type: 3}
+    sprite: {fileID: 21300000, guid: 8a79bb9ca29385c4081d04ed41f26f18, type: 3}
   - color: 1
-    sprite: {fileID: 21300000, guid: 60172776f27911d49a3eefdabe14db05, type: 3}
+    sprite: {fileID: 21300000, guid: 7229482e17125b34ead1b95c09a52288, type: 3}
   - color: 2
-    sprite: {fileID: 21300000, guid: 5883b85230b5f94418632fa1c1b1b605, type: 3}
+    sprite: {fileID: 21300000, guid: 0f7631aa6d159254592b59837e0025e1, type: 3}
   - color: 3
-    sprite: {fileID: 21300000, guid: e29e5c50eb44a82419421fea09be3ecc, type: 3}
+    sprite: {fileID: 21300000, guid: 0b056abd28b23b2478952620d99b3a71, type: 3}
   - color: 4
-    sprite: {fileID: 21300000, guid: 1135bb60951193b48b0abe5d01de0386, type: 3}
+    sprite: {fileID: 21300000, guid: 9f7a90dc9bff74642a6e7cd92c018fd0, type: 3}
 --- !u!61 &61163314065986320
 BoxCollider2D:
   m_ObjectHideFlags: 0

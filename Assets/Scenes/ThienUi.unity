@@ -1093,6 +1093,7 @@ GameObject:
   m_Component:
   - component: {fileID: 625154142}
   - component: {fileID: 625154141}
+  - component: {fileID: 625154143}
   m_Layer: 0
   m_Name: player
   m_TagString: Untagged
@@ -1141,6 +1142,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &625154143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 625154140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd0fd0d5de0d65a448d02dc244710374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::skill
+  levelRef: {fileID: 1773144088}
+  PlayerStat: {fileID: 625154141}
 --- !u!1 &786600423
 GameObject:
   m_ObjectHideFlags: 0
@@ -1725,7 +1740,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e76c7eb3de7839d4bafbba9ed0a18ec3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::enemy
-  enemyMaxHp: 1000
+  enemyMaxHp: 10000
   enemyCurrentHp: 200
   enemyAttack: 15
   hpSlider: {fileID: 2114268728}
@@ -2062,6 +2077,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameGrid: {fileID: 581336197}
   hud: {fileID: 97316481}
+  playerSkillRef: {fileID: 625154143}
   score1Star: 15000
   score2Star: 18000
   score3Star: 21000

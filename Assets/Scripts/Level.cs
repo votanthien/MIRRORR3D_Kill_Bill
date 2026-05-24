@@ -26,6 +26,9 @@ namespace Match3
         private bool _didWin;
         private bool _isGameOver;
         private int _currentFrameShieldMultiplier = 0; // Dùng để gom cụm kẹo Khiên nổ cùng lúc
+        private int heavenShieldTurnsRemaining = 0; // Số lượt buff Khiên Thiên Đường còn lại
+        private int wrathTurnsRemaining = 0; // Số lượt Cơn Thịnh Nộ còn lại
+        private int seeTheSoulTurnsRemaining = 0; // Số lượt buff x3 Mana còn lại
         private void Start()
         {
             hud.SetScore(currentScore);
@@ -34,6 +37,17 @@ namespace Match3
             statplayer.playerCurrentHp = statplayer.playerMaxHp;
             enemy.enemyCurrentHp = enemy.enemyMaxHp;
             _isGameOver = false;
+        }
+        private void Update()
+        {
+            if (heavenShieldTurnsRemaining > 0)
+            {
+                statplayer.maxShield = 6;
+            }
+            else
+            {
+                statplayer.maxShield = 2;
+            }
         }
 
         public LevelType Type => type;
@@ -173,6 +187,50 @@ protected virtual void GameWin()
                     Debug.Log($"❄️ Trạng thái Đóng Băng còn tác dụng trong {frozenTurnsRemaining} lượt nữa.");
                 }
             }
+            if (heavenShieldTurnsRemaining > 0)
+            {
+                heavenShieldTurnsRemaining--;
+                if (heavenShieldTurnsRemaining == 0)
+                {
+                    Debug.Log("😇 Khiên Thiên Đường hết hiệu lực! Giới hạn lá chắn trở lại thành 2.");
+
+                    // Nếu hết buff mà lượng khiên tích lũy vẫn đang > 2, ta ép nó về max mặc định là 2
+                    if (statplayer.playerShield > 2)
+                    {
+                        statplayer.playerShield = 2;
+                        Debug.Log($"🛡️ Lá chắn dư thừa bị vỡ, trả về mức tối đa mặc định: {statplayer.playerShield}/2");
+                    }
+                }
+                else
+                {
+                    Debug.Log($"😇 Buff Khiên Thiên Đường còn tác dụng trong {heavenShieldTurnsRemaining} lượt. (Giới hạn hiện tại: {statplayer.maxShield})");
+                }
+            }
+            if (wrathTurnsRemaining > 0)
+            {
+                wrathTurnsRemaining--;
+                if (wrathTurnsRemaining == 0)
+                {
+                    Debug.Log("💨 Cơn Thịnh Nộ đã kết thúc! Sát thương trở về bình thường.");
+                }
+                else
+                {
+                    Debug.Log($"🔥 Buff Cơn Thịnh Nộ (Sát thương x3) còn tác dụng trong {wrathTurnsRemaining} lượt.");
+                }
+            }
+            // --- ĐOẠN THÊM MỚI: GIẢM LƯỢT BUFF SEE THE SOUL ---
+            if (seeTheSoulTurnsRemaining > 0)
+            {
+                seeTheSoulTurnsRemaining--;
+                if (seeTheSoulTurnsRemaining == 0)
+                {
+                    Debug.Log("👁️ See The Soul đã kết thúc! Lượng Mana hồi phục trở về bình thường.");
+                }
+                else
+                {
+                    Debug.Log($"👁️ Buff See The Soul (Mana x3) còn tác dụng trong {seeTheSoulTurnsRemaining} lượt.");
+                }
+            }
         }
 
 
@@ -269,18 +327,29 @@ protected virtual void GameWin()
         // Hàm hỗ trợ tính toán sát thương/hiệu ứng dựa trên Màu và Hệ số nhân
         public void ApplyRawDamage(ColorType colorType, int multiplier)
         {
+            // Kiểm tra xem chiêu The Wrath có đang kích hoạt không, nếu có thì nhân 3, không thì x1
+            int wrathMultiplier = (wrathTurnsRemaining > 0) ? 3 : 1;
+
             switch (colorType)
             {
                 case ColorType.Sword:
-                    int damage = statplayer.playerAttack * multiplier;
+                    // NHÂN THÊM WRATH MULTIPLIER VÀO SÁT THƯƠNG
+                    int damage = statplayer.playerAttack * multiplier * wrathMultiplier;
                     enemy.enemyCurrentHp -= damage;
-                    Debug.Log($"🗡️ Sword! Gây {damage} Sát thương! (x{multiplier})");
+
+                    string swordMsg = wrathMultiplier > 1 ? "[🔥 X3 WRATH]" : "";
+                    Debug.Log($"🗡️ Sword! Gây {damage} Sát thương! (x{multiplier}) {swordMsg}");
                     break;
 
-                case ColorType.Mana: // <-- Đã sửa: Trả lại đúng case Mana và bỏ chữ private lỗi
-                    int manaRestore = 5 * multiplier;
+                case ColorType.Mana:
+                    // NHÂN THÊM HỆ SỐ SEE THE SOUL VÀO MANA
+                    int soulMultiplier = (seeTheSoulTurnsRemaining > 0) ? 3 : 1;
+
+                    int manaRestore = 5 * multiplier * soulMultiplier;
                     statplayer.playerMana = Mathf.Min(statplayer.playerMana + manaRestore, statplayer.playerMaxMana);
-                    Debug.Log($"🔵 Mana! Hồi {manaRestore} Năng lượng! (x{multiplier})");
+
+                    string soulMsg = soulMultiplier > 1 ? "[👁️ X3 MANA]" : "";
+                    Debug.Log($"🔵 Mana! Hồi {manaRestore} Năng lượng! (x{multiplier}) {soulMsg}");
                     break;
 
                 case ColorType.Hp:
@@ -290,9 +359,12 @@ protected virtual void GameWin()
                     break;
 
                 case ColorType.Spell:
-                    int spellDamage = statplayer.playerSp * multiplier;
+                    // NHÂN THÊM WRATH MULTIPLIER VÀO SÁT THƯƠNG PHÉP
+                    int spellDamage = statplayer.playerSp * multiplier * wrathMultiplier;
                     enemy.enemyCurrentHp -= spellDamage;
-                    Debug.Log($"✨ Spell! Gây {spellDamage} Sát thương phép! (x{multiplier})");
+
+                    string spellMsg = wrathMultiplier > 1 ? "[🔥 X3 WRATH]" : "";
+                    Debug.Log($"✨ Spell! Gây {spellDamage} Sát thương phép! (x{multiplier}) {spellMsg}");
                     break;
             }
         }
@@ -305,9 +377,9 @@ protected virtual void GameWin()
             {
                 // Chỉ cộng khiên DUY NHẤT 1 LẦN cho cả cụm kẹo vừa biến mất
                 int shieldGain = 1 * _currentFrameShieldMultiplier;
-                statplayer.playerShield = Mathf.Min(statplayer.playerShield + shieldGain, 2);
+                statplayer.playerShield = Mathf.Min(statplayer.playerShield + shieldGain, statplayer.maxShield);
 
-                Debug.Log($"🛡️ SHIELD: Cả cụm kẹo nổ giúp hồi {shieldGain} Khiên! (Khiên hiện tại: {statplayer.playerShield}/2)");
+                Debug.Log($"🛡️ SHIELD: Cả cụm kẹo nổ giúp hồi {shieldGain} Khiên! (Khiên hiện tại: {statplayer.playerShield}/{statplayer.maxShield})");
 
                 // Reset lại biến để chuẩn bị cho lượt đi/combo tiếp theo
                 _currentFrameShieldMultiplier = 0;
@@ -399,14 +471,37 @@ protected virtual void GameWin()
         {
             if (_isGameOver) return;
 
-            // Cộng ngay lập tức 2 điểm Khiên cho người chơi
-            // Đảm bảo lượng khiên sau khi cộng không vượt quá mốc tối đa là 2
-            statplayer.playerShield = Mathf.Min(statplayer.playerShield + 2, 2);
+            // SỬA Ở ĐÂY: Thay số 2 bằng hàm GetMaxShieldAllowed() để có thể hồi lên tới 6 khiên
+            statplayer.playerShield = Mathf.Min(statplayer.playerShield + 2, statplayer.maxShield);
 
-            Debug.Log($"🛡️ [SKILL] Thế Thủ! Bạn nhận được 2 Khiên bảo vệ. (Khiên hiện tại: {statplayer.playerShield}/2)");
+            Debug.Log($"🛡️ [SKILL] Thế Thủ! Bạn nhận được 2 Khiên. (Khiên hiện tại: {statplayer.maxShield}/{statplayer.maxShield})");
+        }
+       
+        public void ActivateHeavenShield()
+        {
+            if (_isGameOver) return;
 
-            // Kỹ năng phòng thủ thuần túy nên không cần chạy CheckBattleStatus để kiểm tra máu quái, 
-            // nhưng nếu bạn có UI hiển thị khiên thì nên cập nhật UI ở đây nhé!
+            // Kích hoạt trạng thái nhân 3 giới hạn khiên trong 10 lượt
+            heavenShieldTurnsRemaining = 10;
+            Debug.Log($"😇 [BUFF] Khiên Thiên Đường! Giới hạn lá chắn tăng gấp 3 (Tối đa: {statplayer.maxShield} khiên) trong 10 lượt tiếp theo!");
+
+          
+        }
+        public void ActivateTheWrath()
+        {
+            if (_isGameOver) return;
+
+            // Kích hoạt trạng thái x3 sát thương trong 10 lượt
+            wrathTurnsRemaining = 10;
+            Debug.Log("🔥 [BUFF] Cơn Thịnh Nộ! Sát thương hệ Kiếm (Sword) và Phép (Spell) sẽ được nhân 3 trong 10 lượt tới!");
+        }
+        public void ActivateSeeTheSoul()
+        {
+            if (_isGameOver) return;
+
+            // Kích hoạt trạng thái x3 Mana hồi phục trong 10 lượt
+            seeTheSoulTurnsRemaining = 10;
+            Debug.Log("👁️ [BUFF] See The Soul! Lượng Mana hồi phục khi ăn kẹo sẽ được nhân 3 trong 10 lượt tới!");
         }
     }
 }

@@ -58,7 +58,8 @@ public class PlayerStat : MonoBehaviour
         manaSlider.value = playerMana;
 
         // Text số khiên
-        shieldText.text = playerShield + "/2";
+        shieldText.text = playerShield + "/" + maxShield
+        ;
 
         // Đổi màu ICON khiên
         if (playerShield <= 0)
