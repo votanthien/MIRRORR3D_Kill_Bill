@@ -29,6 +29,11 @@ namespace Match3
         private int heavenShieldTurnsRemaining = 0; // Số lượt buff Khiên Thiên Đường còn lại
         private int wrathTurnsRemaining = 0; // Số lượt Cơn Thịnh Nộ còn lại
         private int seeTheSoulTurnsRemaining = 0; // Số lượt buff x3 Mana còn lại
+        private int meditationTurnsRemaining = 0; // Số lượt buff x3 Hồi Máu còn lại
+        private int phoenixWingsTurnsRemaining = 0; // Số lượt buff bảo hộ hồi sinh còn lại
+
+        private int healingLeafTurnsRemaining = 0; // Số lượt hồi máu còn lại
+        private float healingLeafPercent = 0.07f;  // 7% máu mỗi lượt
         private void Start()
         {
             hud.SetScore(currentScore);
@@ -231,6 +236,43 @@ protected virtual void GameWin()
                     Debug.Log($"👁️ Buff See The Soul (Mana x3) còn tác dụng trong {seeTheSoulTurnsRemaining} lượt.");
                 }
             }
+            // --- ĐOẠN THÊM MỚI: GIẢM LƯỢT BUFF MIND OF MEDITATION ---
+            if (meditationTurnsRemaining > 0)
+            {
+                meditationTurnsRemaining--;
+                if (meditationTurnsRemaining == 0)
+                {
+                    Debug.Log("🧘‍♂️ Mind of Meditation đã kết thúc! Lượng HP hồi phục trở về bình thường.");
+                }
+                else
+                {
+                    Debug.Log($"🧘‍♂️ Buff Mind of Meditation (HP x3) còn tác dụng trong {meditationTurnsRemaining} lượt.");
+                }
+            }
+            // --- ĐOẠN THÊM MỚI: GIẢM LƯỢT BUFF PHOENIX WINGS ---
+            if (phoenixWingsTurnsRemaining > 0)
+            {
+                phoenixWingsTurnsRemaining--;
+                if (phoenixWingsTurnsRemaining == 0)
+                {
+                    Debug.Log("🔥 Phoenix Wings đã hết hiệu lực! Bạn không còn được bảo hộ hồi sinh nữa.");
+                }
+                else
+                {
+                    Debug.Log($"🔥 Buff Phoenix Wings (Hồi sinh) còn tác dụng trong {phoenixWingsTurnsRemaining} lượt.");
+                }
+            }
+            if (healingLeafTurnsRemaining > 0 && statplayer.playerCurrentHp > 0)
+            {
+                // Tính 7% lượng máu dựa trên MÁU TỐI ĐA của người chơi
+                int healAmount = Mathf.RoundToInt(statplayer.playerMaxHp * healingLeafPercent);
+
+                // Tiến hành hồi máu và khống chế không vượt quá máu tối đa
+                statplayer.playerCurrentHp = Mathf.Min(statplayer.playerCurrentHp + healAmount, statplayer.playerMaxHp);
+                healingLeafTurnsRemaining--;
+
+                Debug.Log($"🍃 [HEALING LEAF] Kích hoạt! Bạn được hồi {healAmount} HP. Máu hiện tại: {statplayer.playerCurrentHp}/{statplayer.playerMaxHp} (Còn lại {healingLeafTurnsRemaining} lượt buff)");
+            }
         }
 
 
@@ -303,8 +345,24 @@ protected virtual void GameWin()
             }
             else if (statplayer.playerCurrentHp <= 0)
             {
-                Debug.Log("💀 Bạn đã hết HP! Thất bại!");
-                GameLose();
+                // 🔥 KIỂM TRA BUFF HỒI SINH TRƯỚC KHI TÍNH LÀ THUA
+                if (phoenixWingsTurnsRemaining > 0)
+                {
+                    // Tính toán lượng máu hồi lại bằng 40% Máu tối đa
+                    int reviveHp = Mathf.RoundToInt(statplayer.playerMaxHp * 0.40f);
+                    statplayer.playerCurrentHp = reviveHp;
+
+                    // Xóa buff ngay lập tức sau khi đã dùng mạng hồi sinh này
+                    phoenixWingsTurnsRemaining = 0;
+
+                    Debug.Log($"🔥 [PHOENIX WINGS] Bạn đã hồi sinh từ tro tàn! Trả lại {reviveHp} HP (40% Máu tối đa). Trận đấu tiếp tục!");
+                }
+                else
+                {
+                    // Nếu không có buff thì chết thật
+                    Debug.Log("💀 Bạn đã hết HP! Thất bại!");
+                    GameLose();
+                }
             }
         }
 
@@ -353,9 +411,14 @@ protected virtual void GameWin()
                     break;
 
                 case ColorType.Hp:
-                    int hpRestore = 10 * multiplier;
+                    // NHÂN THÊM HỆ SỐ MEDITATION VÀO LƯỢNG MÁU HỒI
+                    int meditationMultiplier = (meditationTurnsRemaining > 0) ? 3 : 1;
+
+                    int hpRestore = 10 * multiplier * meditationMultiplier;
                     statplayer.playerCurrentHp = Mathf.Min(statplayer.playerCurrentHp + hpRestore, statplayer.playerMaxHp);
-                    Debug.Log($"❤️ HP! Hồi {hpRestore} Máu! (x{multiplier})");
+
+                    string meditationMsg = meditationMultiplier > 1 ? "[🧘‍♂️ X3 HP]" : "";
+                    Debug.Log($"❤️ HP! Hồi {hpRestore} Máu! (x{multiplier}) {meditationMsg}");
                     break;
 
                 case ColorType.Spell:
@@ -502,6 +565,45 @@ protected virtual void GameWin()
             // Kích hoạt trạng thái x3 Mana hồi phục trong 10 lượt
             seeTheSoulTurnsRemaining = 10;
             Debug.Log("👁️ [BUFF] See The Soul! Lượng Mana hồi phục khi ăn kẹo sẽ được nhân 3 trong 10 lượt tới!");
+        }
+        public void ActivateMindOfMeditation()
+        {
+            if (_isGameOver) return;
+
+            // Kích hoạt trạng thái x3 hồi máu từ kẹo HP trong 10 lượt
+            meditationTurnsRemaining = 10;
+            Debug.Log("🧘‍♂️ [BUFF] Mind of Meditation! Lượng HP hồi phục từ kẹo Trái Tim sẽ được nhân 3 trong 10 lượt tới!");
+        }
+        public void ActivatePhoenixWings()
+        {
+            if (_isGameOver) return;
+
+            // Kích hoạt trạng thái bảo hộ hồi sinh trong 10 lượt
+            phoenixWingsTurnsRemaining = 10;
+            Debug.Log("🔥 [BUFF] Phoenix Wings! Đôi cánh phượng hoàng dang rộng, bạn sẽ được tự động hồi sinh nếu cạn máu trong 10 lượt tới!");
+        }
+        public void ActivateHealingLeaf()
+        {
+            if (_isGameOver) return;
+
+            // Kích hoạt bùa lợi hồi máu trong 4 lượt
+            healingLeafTurnsRemaining = 4;
+            Debug.Log("🍃 [BUFF] Healing Leaf! Lá cây chữa lành bao bọc lấy bạn, hồi 7% máu tối đa mỗi lượt trong 4 lượt tới.");
+        }
+        public void ActivateTreeOfLife()
+        {
+            if (_isGameOver) return;
+
+            // 1. Tính toán lượng máu hồi phục = 70% Máu tối đa của người chơi
+            int healAmount = Mathf.RoundToInt(statplayer.playerMaxHp * 0.70f);
+
+            // 2. Tiến hành cộng máu và khống chế không cho vượt quá lượng máu tối đa (playerMaxHp)
+            statplayer.playerCurrentHp = Mathf.Min(statplayer.playerCurrentHp + healAmount, statplayer.playerMaxHp);
+
+            Debug.Log($"🌳 [SKILL] Tree of Life kích hoạt! Gọi ra đại thụ sinh mệnh, hồi ngay lập tức {healAmount} HP. Máu hiện tại: {statplayer.playerCurrentHp}/{statplayer.playerMaxHp}");
+
+            // Kiểm tra lại trạng thái trận đấu (nếu cần)
+            CheckBattleStatus();
         }
     }
 }

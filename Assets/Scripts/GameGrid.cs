@@ -766,6 +766,25 @@ namespace Match3
 
             return piecesOfType;
         }
+        public void ChangePieceToRainbow(int x, int y)
+        {
+            // 1. Phải hủy GameObject của viên kẹo cũ tại ô đó trước để tránh bị đè chồng lên nhau
+            if (_pieces[x, y] != null)
+            {
+                Destroy(_pieces[x, y].gameObject);
+            }
+
+            // 2. Gọi hàm Spawn viên mới loại Rainbow (Hàm có sẵn trên lưới của bạn)
+            SpawnNewPiece(x, y, PieceType.Rainbow);
+        }
+        public void HammerDestroyPiece(int x, int y)
+        {
+            // 1. Gọi hàm đập vỡ kẹo (ô đó sẽ biến thành ô trống)
+            ClearPiece(x, y);
+
+            // 🔥 BỔ SUNG DÒNG NÀY: Ép lưới game chạy Coroutine dồn kẹo rơi xuống ngay lập tức!
+            StartCoroutine(Fill());
+        }
 
     }
 }
