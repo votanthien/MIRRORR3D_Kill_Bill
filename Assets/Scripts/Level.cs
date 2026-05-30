@@ -34,6 +34,8 @@ namespace Match3
 
         private int healingLeafTurnsRemaining = 0; // Số lượt hồi máu còn lại
         private float healingLeafPercent = 0.07f;  // 7% máu mỗi lượt
+
+        private int _currentFrameSwordCount = 0;
         private void Start()
         {
             hud.SetScore(currentScore);
@@ -47,11 +49,11 @@ namespace Match3
         {
             if (heavenShieldTurnsRemaining > 0)
             {
-                statplayer.maxShield = 6;
+                statplayer.maxShield = 60;
             }
             else
             {
-                statplayer.maxShield = 2;
+                statplayer.maxShield = 20;
             }
         }
 
@@ -111,10 +113,21 @@ namespace Match3
                         StartCoroutine(ApplyShieldAtEndOfFrame());
                     }
                     // Lấy hệ số nhân lớn nhất trong các viên vừa nổ (nếu có cục Lv2 hoặc Lv3 ở trong hàng)
-                    if (multiplier > _currentFrameShieldMultiplier)
+                   
+                        _currentFrameShieldMultiplier += multiplier;
+                    
+                }
+                else if (colorType == ColorType.Sword)
+                {
+                    if (_currentFrameSwordCount == 0)
                     {
-                        _currentFrameShieldMultiplier = multiplier;
+                        // Kích hoạt bộ xử lý tính sát thương Kiếm vào cuối khung hình
+                        StartCoroutine(ApplySwordDamageAtEndOfFrame());
                     }
+
+                    // Cộng dồn số lượng viên Kiếm bị phá hủy trong cụm combo này
+                    // Nếu viên nổ là hàng Clear (Lv2) hoặc Lv3, chúng ta cộng tương ứng theo multiplier để tính thưởng viên
+                    _currentFrameSwordCount += multiplier;
                 }
                 else
                 {
@@ -125,11 +138,51 @@ namespace Match3
 
             CheckBattleStatus();
         }
+        private IEnumerator ApplySwordDamageAtEndOfFrame()
+        {
+            // Đợi toàn bộ các viên kẹo Kiếm trong lượt nổ này được dọn sạch hoàn toàn
+            yield return new WaitForEndOfFrame();
 
-      
-    
+            if (_currentFrameSwordCount > 0)
+            {
+                // 1. Xác định hệ số nhân sát thương dựa trên số lượng kiếm ăn được
+                int swordMultiplier = 3; // Mặc định ăn 3 viên = 3 điểm (x3 playerAttack)
 
-protected virtual void GameWin()
+                if (_currentFrameSwordCount == 4)
+                {
+                    swordMultiplier = 6; // Ăn 4 viên = 6 điểm (x6 playerAttack)
+                }
+                else if (_currentFrameSwordCount >= 5)
+                {
+                    swordMultiplier = 12; // Ăn 5 viên trở lên = 12 điểm (x12 playerAttack)
+                }
+                // Trường hợp hiếm gặp nếu nổ dây chuyền rơi lẻ chỉ được 1-2 viên
+                else if (_currentFrameSwordCount < 3)
+                {
+                    swordMultiplier = _currentFrameSwordCount;
+                }
+
+                // 2. Kiểm tra trạng thái buff cuồng nộ (The Wrath) nhân 3 sát thương kiếm
+                int wrathMultiplier = (wrathTurnsRemaining > 0) ? 3 : 1;
+
+                // 3. Tính toán tổng sát thương cuối cùng
+                int finalDamage = statplayer.playerAttack * swordMultiplier * wrathMultiplier;
+                enemy.enemyCurrentHp -= finalDamage;
+
+                // In nhật ký log ra màn hình Console để dễ theo dõi
+                string wrathMsg = wrathMultiplier > 1 ? " [🔥 X3 WRATH]" : "";
+                Debug.Log($"🗡️ SWORD COMBO: Phá hủy tổng cộng {_currentFrameSwordCount} viên Kiếm! " +
+                          $"Hệ số điểm: x{swordMultiplier}. Gây {finalDamage} Sát thương lên quái!{wrathMsg}");
+
+                // 4. Reset bộ đếm và cập nhật trạng thái trận đấu
+                _currentFrameSwordCount = 0;
+                CheckBattleStatus();
+            }
+        }
+
+
+
+        protected virtual void GameWin()
         {
             _isGameOver = true;
             gameGrid.GameOver();
@@ -317,17 +370,26 @@ protected virtual void GameWin()
             }
             // =========================================================================
 
-            if (statplayer.playerShield > 0)
+            int shieldDamage = 10; // Quái mặc định đánh trừ 10 điểm khiên theo yêu cầu
+
+            if (statplayer.playerShield >= shieldDamage)
             {
-                // Nếu có khiên, khiên sẽ hấp thụ toàn bộ đòn đánh và giảm đi 1 điểm
-                statplayer.playerShield--;
-                Debug.Log($"🛡️ Khiên của bạn đã đỡ đòn! Khiên còn lại: {statplayer.playerShield}/2. Bạn không mất máu.");
+                // Trường hợp 1: Khiên có từ 10 điểm trở lên -> Trừ sạch vào khiên, máu an toàn tuyệt đối
+                statplayer.playerShield -= shieldDamage;
+                Debug.Log($"🛡️ Giáp của bạn chống đỡ hoàn toàn! Khiên bị trừ {shieldDamage} điểm. " +
+                          $"Khiên còn lại: {statplayer.playerShield}. Bạn không bị mất máu.");
             }
             else
             {
-                // Nếu không có khiên, trừ lượng sát thương thực tế (đã tính giảm công nếu có nguyền) trực tiếp vào HP
-                statplayer.playerCurrentHp -= finalEnemyAttack;
-                Debug.Log($"💥 Quái cắn bạn! Bạn mất {finalEnemyAttack} HP. Máu còn lại: {statplayer.playerCurrentHp}/{statplayer.playerMaxHp}");
+                // Trường hợp 2: Khiên dưới 10 điểm -> Trừ hết số khiên đang có, lượng sát thương còn thừa đập vào HP
+                 // Số điểm sát thương tràn qua khiên
+
+
+
+              
+                statplayer.playerCurrentHp -= enemy.enemyAttack; // Trừ máu lượng còn thiếu
+
+                Debug.Log($"🩸 Bạn bị mất {enemy.enemyAttack} HP! Máu còn lại: {statplayer.playerCurrentHp}/{statplayer.playerMaxHp}");
             }
 
             // Bước 4: Kiểm tra xem người chơi có bị hết máu sau đòn đánh của quái không
@@ -390,15 +452,7 @@ protected virtual void GameWin()
 
             switch (colorType)
             {
-                case ColorType.Sword:
-                    // NHÂN THÊM WRATH MULTIPLIER VÀO SÁT THƯƠNG
-                    int damage = statplayer.playerAttack * multiplier * wrathMultiplier;
-                    enemy.enemyCurrentHp -= damage;
-
-                    string swordMsg = wrathMultiplier > 1 ? "[🔥 X3 WRATH]" : "";
-                    Debug.Log($"🗡️ Sword! Gây {damage} Sát thương! (x{multiplier}) {swordMsg}");
-                    break;
-
+                
                 case ColorType.Mana:
                     // NHÂN THÊM HỆ SỐ SEE THE SOUL VÀO MANA
                     int soulMultiplier = (seeTheSoulTurnsRemaining > 0) ? 3 : 1;
@@ -433,18 +487,39 @@ protected virtual void GameWin()
         }
         private IEnumerator ApplyShieldAtEndOfFrame()
         {
-            // Đợi đến cuối khung hình khi toàn bộ các viên kẹo trong hàng 3 đã nổ xong xuôi
+            // Đợi đến cuối khung hình khi toàn bộ các viên kẹo trong cụm đã nổ xong xuôi
             yield return new WaitForEndOfFrame();
 
             if (_currentFrameShieldMultiplier > 0)
             {
-                // Chỉ cộng khiên DUY NHẤT 1 LẦN cho cả cụm kẹo vừa biến mất
-                int shieldGain = 1 * _currentFrameShieldMultiplier;
+                // 1. Xác định số điểm khiên nhận được dựa trên số lượng kẹo Khiên nổ (multiplier)
+                int shieldGain = 0;
+
+                if (_currentFrameShieldMultiplier == 3)
+                {
+                    shieldGain = 3;  // Ăn 3 viên = 3 điểm khiên
+                }
+                else if (_currentFrameShieldMultiplier == 4)
+                {
+                    shieldGain = 4;  // Ăn 4 viên = 4 điểm khiên
+                }
+                else if (_currentFrameShieldMultiplier >= 5)
+                {
+                    shieldGain = 20; // Ăn 5 viên trở lên = 20 điểm khiên cực khủng!
+                }
+                else
+                {
+                    // Phòng trường hợp combo rơi lẻ tẻ nhỏ hơn 3 viên
+                    shieldGain = _currentFrameShieldMultiplier;
+                }
+
+                // 2. Cộng tích lũy vào hệ thống khiên của người chơi (khống chế theo maxShield)
                 statplayer.playerShield = Mathf.Min(statplayer.playerShield + shieldGain, statplayer.maxShield);
 
-                Debug.Log($"🛡️ SHIELD: Cả cụm kẹo nổ giúp hồi {shieldGain} Khiên! (Khiên hiện tại: {statplayer.playerShield}/{statplayer.maxShield})");
+                Debug.Log($"🛡️ SHIELD COMBO: Nổ cụm {_currentFrameShieldMultiplier} viên Khiên! " +
+                          $"Tích lũy được +{shieldGain} điểm khiên. (Khiên hiện tại: {statplayer.playerShield}/{statplayer.maxShield})");
 
-                // Reset lại biến để chuẩn bị cho lượt đi/combo tiếp theo
+                // Reset lại biến đếm để chuẩn bị cho combo tiếp theo
                 _currentFrameShieldMultiplier = 0;
                 CheckBattleStatus();
             }
