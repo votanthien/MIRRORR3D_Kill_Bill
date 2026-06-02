@@ -1156,6 +1156,83 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::skill
   levelRef: {fileID: 1773144088}
   PlayerStat: {fileID: 625154141}
+--- !u!1001 &757638805
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 5.2018156
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -3.5942225
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 86.26905
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.00000034272662
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -1.3382751e-24
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 5.9164554e-31
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -180
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_Name
+      value: G1_MODEL
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 58ec04f46ce830a47b5831b313b7f352, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
+      propertyPath: m_WarningMessage
+      value: 
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 366bc0e89e0c41141b8e3e78812c2b0b, type: 3}
 --- !u!1 &786600423
 GameObject:
   m_ObjectHideFlags: 0
@@ -1740,8 +1817,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e76c7eb3de7839d4bafbba9ed0a18ec3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::enemy
-  enemyMaxHp: 10000
-  enemyCurrentHp: 200
+  enemyMaxHp: 500
+  enemyCurrentHp: 500
   enemyAttack: 15
   hpSlider: {fileID: 2114268728}
 --- !u!4 &1439421571
@@ -2075,7 +2152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c5a84fd32077c94eb38cbf259d2ac2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameGrid: {fileID: 581336197}
+  gameGrid: {fileID: 0}
   hud: {fileID: 97316481}
   playerSkillRef: {fileID: 625154143}
   score1Star: 15000
@@ -2708,3 +2785,4 @@ SceneRoots:
   - {fileID: 625154142}
   - {fileID: 1439421571}
   - {fileID: 154745600}
+  - {fileID: 757638805}
