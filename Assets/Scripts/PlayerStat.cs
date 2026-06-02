@@ -13,7 +13,7 @@ public class PlayerStat : MonoBehaviour
 
     [Header("Shield")]
     public int playerShield = 0;
-    public int maxShield = 2;
+    public int maxShield = 20;
 
     public int playerAttack = 10;
     public int playerSp = 15;
@@ -68,13 +68,13 @@ public class PlayerStat : MonoBehaviour
             khien1.SetActive(false);
             khien2.SetActive(false);
         }
-        if (playerShield == 1)
+        if (playerShield == 10)
         {
             shieldImage.color = activeShieldColor; 
             khien1.SetActive(true);
             khien2.SetActive(false);
         }
-        if (playerShield == 2)
+        if (playerShield == 20)
         {
             shieldImage.color = activeShieldColor; 
             khien1.SetActive(true);

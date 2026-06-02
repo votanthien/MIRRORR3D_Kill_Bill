@@ -29,6 +29,13 @@ namespace Match3
         private int heavenShieldTurnsRemaining = 0; // Số lượt buff Khiên Thiên Đường còn lại
         private int wrathTurnsRemaining = 0; // Số lượt Cơn Thịnh Nộ còn lại
         private int seeTheSoulTurnsRemaining = 0; // Số lượt buff x3 Mana còn lại
+        private int meditationTurnsRemaining = 0; // Số lượt buff x3 Hồi Máu còn lại
+        private int phoenixWingsTurnsRemaining = 0; // Số lượt buff bảo hộ hồi sinh còn lại
+
+        private int healingLeafTurnsRemaining = 0; // Số lượt hồi máu còn lại
+        private float healingLeafPercent = 0.07f;  // 7% máu mỗi lượt
+
+        private int _currentFrameSwordCount = 0;
         private void Start()
         {
             hud.SetScore(currentScore);
@@ -42,11 +49,11 @@ namespace Match3
         {
             if (heavenShieldTurnsRemaining > 0)
             {
-                statplayer.maxShield = 6;
+                statplayer.maxShield = 60;
             }
             else
             {
-                statplayer.maxShield = 2;
+                statplayer.maxShield = 20;
             }
         }
 
@@ -106,10 +113,21 @@ namespace Match3
                         StartCoroutine(ApplyShieldAtEndOfFrame());
                     }
                     // Lấy hệ số nhân lớn nhất trong các viên vừa nổ (nếu có cục Lv2 hoặc Lv3 ở trong hàng)
-                    if (multiplier > _currentFrameShieldMultiplier)
+                   
+                        _currentFrameShieldMultiplier += multiplier;
+                    
+                }
+                else if (colorType == ColorType.Sword)
+                {
+                    if (_currentFrameSwordCount == 0)
                     {
-                        _currentFrameShieldMultiplier = multiplier;
+                        // Kích hoạt bộ xử lý tính sát thương Kiếm vào cuối khung hình
+                        StartCoroutine(ApplySwordDamageAtEndOfFrame());
                     }
+
+                    // Cộng dồn số lượng viên Kiếm bị phá hủy trong cụm combo này
+                    // Nếu viên nổ là hàng Clear (Lv2) hoặc Lv3, chúng ta cộng tương ứng theo multiplier để tính thưởng viên
+                    _currentFrameSwordCount += multiplier;
                 }
                 else
                 {
@@ -120,11 +138,51 @@ namespace Match3
 
             CheckBattleStatus();
         }
+        private IEnumerator ApplySwordDamageAtEndOfFrame()
+        {
+            // Đợi toàn bộ các viên kẹo Kiếm trong lượt nổ này được dọn sạch hoàn toàn
+            yield return new WaitForEndOfFrame();
 
-      
-    
+            if (_currentFrameSwordCount > 0)
+            {
+                // 1. Xác định hệ số nhân sát thương dựa trên số lượng kiếm ăn được
+                int swordMultiplier = 3; // Mặc định ăn 3 viên = 3 điểm (x3 playerAttack)
 
-protected virtual void GameWin()
+                if (_currentFrameSwordCount == 4)
+                {
+                    swordMultiplier = 6; // Ăn 4 viên = 6 điểm (x6 playerAttack)
+                }
+                else if (_currentFrameSwordCount >= 5)
+                {
+                    swordMultiplier = 12; // Ăn 5 viên trở lên = 12 điểm (x12 playerAttack)
+                }
+                // Trường hợp hiếm gặp nếu nổ dây chuyền rơi lẻ chỉ được 1-2 viên
+                else if (_currentFrameSwordCount < 3)
+                {
+                    swordMultiplier = _currentFrameSwordCount;
+                }
+
+                // 2. Kiểm tra trạng thái buff cuồng nộ (The Wrath) nhân 3 sát thương kiếm
+                int wrathMultiplier = (wrathTurnsRemaining > 0) ? 3 : 1;
+
+                // 3. Tính toán tổng sát thương cuối cùng
+                int finalDamage = statplayer.playerAttack * swordMultiplier * wrathMultiplier;
+                enemy.enemyCurrentHp -= finalDamage;
+
+                // In nhật ký log ra màn hình Console để dễ theo dõi
+                string wrathMsg = wrathMultiplier > 1 ? " [🔥 X3 WRATH]" : "";
+                Debug.Log($"🗡️ SWORD COMBO: Phá hủy tổng cộng {_currentFrameSwordCount} viên Kiếm! " +
+                          $"Hệ số điểm: x{swordMultiplier}. Gây {finalDamage} Sát thương lên quái!{wrathMsg}");
+
+                // 4. Reset bộ đếm và cập nhật trạng thái trận đấu
+                _currentFrameSwordCount = 0;
+                CheckBattleStatus();
+            }
+        }
+
+
+
+        protected virtual void GameWin()
         {
             _isGameOver = true;
             gameGrid.GameOver();
@@ -231,6 +289,43 @@ protected virtual void GameWin()
                     Debug.Log($"👁️ Buff See The Soul (Mana x3) còn tác dụng trong {seeTheSoulTurnsRemaining} lượt.");
                 }
             }
+            // --- ĐOẠN THÊM MỚI: GIẢM LƯỢT BUFF MIND OF MEDITATION ---
+            if (meditationTurnsRemaining > 0)
+            {
+                meditationTurnsRemaining--;
+                if (meditationTurnsRemaining == 0)
+                {
+                    Debug.Log("🧘‍♂️ Mind of Meditation đã kết thúc! Lượng HP hồi phục trở về bình thường.");
+                }
+                else
+                {
+                    Debug.Log($"🧘‍♂️ Buff Mind of Meditation (HP x3) còn tác dụng trong {meditationTurnsRemaining} lượt.");
+                }
+            }
+            // --- ĐOẠN THÊM MỚI: GIẢM LƯỢT BUFF PHOENIX WINGS ---
+            if (phoenixWingsTurnsRemaining > 0)
+            {
+                phoenixWingsTurnsRemaining--;
+                if (phoenixWingsTurnsRemaining == 0)
+                {
+                    Debug.Log("🔥 Phoenix Wings đã hết hiệu lực! Bạn không còn được bảo hộ hồi sinh nữa.");
+                }
+                else
+                {
+                    Debug.Log($"🔥 Buff Phoenix Wings (Hồi sinh) còn tác dụng trong {phoenixWingsTurnsRemaining} lượt.");
+                }
+            }
+            if (healingLeafTurnsRemaining > 0 && statplayer.playerCurrentHp > 0)
+            {
+                // Tính 7% lượng máu dựa trên MÁU TỐI ĐA của người chơi
+                int healAmount = Mathf.RoundToInt(statplayer.playerMaxHp * healingLeafPercent);
+
+                // Tiến hành hồi máu và khống chế không vượt quá máu tối đa
+                statplayer.playerCurrentHp = Mathf.Min(statplayer.playerCurrentHp + healAmount, statplayer.playerMaxHp);
+                healingLeafTurnsRemaining--;
+
+                Debug.Log($"🍃 [HEALING LEAF] Kích hoạt! Bạn được hồi {healAmount} HP. Máu hiện tại: {statplayer.playerCurrentHp}/{statplayer.playerMaxHp} (Còn lại {healingLeafTurnsRemaining} lượt buff)");
+            }
         }
 
 
@@ -275,17 +370,26 @@ protected virtual void GameWin()
             }
             // =========================================================================
 
-            if (statplayer.playerShield > 0)
+            int shieldDamage = 10; // Quái mặc định đánh trừ 10 điểm khiên theo yêu cầu
+
+            if (statplayer.playerShield >= shieldDamage)
             {
-                // Nếu có khiên, khiên sẽ hấp thụ toàn bộ đòn đánh và giảm đi 1 điểm
-                statplayer.playerShield--;
-                Debug.Log($"🛡️ Khiên của bạn đã đỡ đòn! Khiên còn lại: {statplayer.playerShield}/2. Bạn không mất máu.");
+                // Trường hợp 1: Khiên có từ 10 điểm trở lên -> Trừ sạch vào khiên, máu an toàn tuyệt đối
+                statplayer.playerShield -= shieldDamage;
+                Debug.Log($"🛡️ Giáp của bạn chống đỡ hoàn toàn! Khiên bị trừ {shieldDamage} điểm. " +
+                          $"Khiên còn lại: {statplayer.playerShield}. Bạn không bị mất máu.");
             }
             else
             {
-                // Nếu không có khiên, trừ lượng sát thương thực tế (đã tính giảm công nếu có nguyền) trực tiếp vào HP
-                statplayer.playerCurrentHp -= finalEnemyAttack;
-                Debug.Log($"💥 Quái cắn bạn! Bạn mất {finalEnemyAttack} HP. Máu còn lại: {statplayer.playerCurrentHp}/{statplayer.playerMaxHp}");
+                // Trường hợp 2: Khiên dưới 10 điểm -> Trừ hết số khiên đang có, lượng sát thương còn thừa đập vào HP
+                 // Số điểm sát thương tràn qua khiên
+
+
+
+              
+                statplayer.playerCurrentHp -= enemy.enemyAttack; // Trừ máu lượng còn thiếu
+
+                Debug.Log($"🩸 Bạn bị mất {enemy.enemyAttack} HP! Máu còn lại: {statplayer.playerCurrentHp}/{statplayer.playerMaxHp}");
             }
 
             // Bước 4: Kiểm tra xem người chơi có bị hết máu sau đòn đánh của quái không
@@ -303,8 +407,24 @@ protected virtual void GameWin()
             }
             else if (statplayer.playerCurrentHp <= 0)
             {
-                Debug.Log("💀 Bạn đã hết HP! Thất bại!");
-                GameLose();
+                // 🔥 KIỂM TRA BUFF HỒI SINH TRƯỚC KHI TÍNH LÀ THUA
+                if (phoenixWingsTurnsRemaining > 0)
+                {
+                    // Tính toán lượng máu hồi lại bằng 40% Máu tối đa
+                    int reviveHp = Mathf.RoundToInt(statplayer.playerMaxHp * 0.40f);
+                    statplayer.playerCurrentHp = reviveHp;
+
+                    // Xóa buff ngay lập tức sau khi đã dùng mạng hồi sinh này
+                    phoenixWingsTurnsRemaining = 0;
+
+                    Debug.Log($"🔥 [PHOENIX WINGS] Bạn đã hồi sinh từ tro tàn! Trả lại {reviveHp} HP (40% Máu tối đa). Trận đấu tiếp tục!");
+                }
+                else
+                {
+                    // Nếu không có buff thì chết thật
+                    Debug.Log("💀 Bạn đã hết HP! Thất bại!");
+                    GameLose();
+                }
             }
         }
 
@@ -332,15 +452,7 @@ protected virtual void GameWin()
 
             switch (colorType)
             {
-                case ColorType.Sword:
-                    // NHÂN THÊM WRATH MULTIPLIER VÀO SÁT THƯƠNG
-                    int damage = statplayer.playerAttack * multiplier * wrathMultiplier;
-                    enemy.enemyCurrentHp -= damage;
-
-                    string swordMsg = wrathMultiplier > 1 ? "[🔥 X3 WRATH]" : "";
-                    Debug.Log($"🗡️ Sword! Gây {damage} Sát thương! (x{multiplier}) {swordMsg}");
-                    break;
-
+                
                 case ColorType.Mana:
                     // NHÂN THÊM HỆ SỐ SEE THE SOUL VÀO MANA
                     int soulMultiplier = (seeTheSoulTurnsRemaining > 0) ? 3 : 1;
@@ -353,9 +465,14 @@ protected virtual void GameWin()
                     break;
 
                 case ColorType.Hp:
-                    int hpRestore = 10 * multiplier;
+                    // NHÂN THÊM HỆ SỐ MEDITATION VÀO LƯỢNG MÁU HỒI
+                    int meditationMultiplier = (meditationTurnsRemaining > 0) ? 3 : 1;
+
+                    int hpRestore = 10 * multiplier * meditationMultiplier;
                     statplayer.playerCurrentHp = Mathf.Min(statplayer.playerCurrentHp + hpRestore, statplayer.playerMaxHp);
-                    Debug.Log($"❤️ HP! Hồi {hpRestore} Máu! (x{multiplier})");
+
+                    string meditationMsg = meditationMultiplier > 1 ? "[🧘‍♂️ X3 HP]" : "";
+                    Debug.Log($"❤️ HP! Hồi {hpRestore} Máu! (x{multiplier}) {meditationMsg}");
                     break;
 
                 case ColorType.Spell:
@@ -370,18 +487,39 @@ protected virtual void GameWin()
         }
         private IEnumerator ApplyShieldAtEndOfFrame()
         {
-            // Đợi đến cuối khung hình khi toàn bộ các viên kẹo trong hàng 3 đã nổ xong xuôi
+            // Đợi đến cuối khung hình khi toàn bộ các viên kẹo trong cụm đã nổ xong xuôi
             yield return new WaitForEndOfFrame();
 
             if (_currentFrameShieldMultiplier > 0)
             {
-                // Chỉ cộng khiên DUY NHẤT 1 LẦN cho cả cụm kẹo vừa biến mất
-                int shieldGain = 1 * _currentFrameShieldMultiplier;
+                // 1. Xác định số điểm khiên nhận được dựa trên số lượng kẹo Khiên nổ (multiplier)
+                int shieldGain = 0;
+
+                if (_currentFrameShieldMultiplier == 3)
+                {
+                    shieldGain = 3;  // Ăn 3 viên = 3 điểm khiên
+                }
+                else if (_currentFrameShieldMultiplier == 4)
+                {
+                    shieldGain = 4;  // Ăn 4 viên = 4 điểm khiên
+                }
+                else if (_currentFrameShieldMultiplier >= 5)
+                {
+                    shieldGain = 20; // Ăn 5 viên trở lên = 20 điểm khiên cực khủng!
+                }
+                else
+                {
+                    // Phòng trường hợp combo rơi lẻ tẻ nhỏ hơn 3 viên
+                    shieldGain = _currentFrameShieldMultiplier;
+                }
+
+                // 2. Cộng tích lũy vào hệ thống khiên của người chơi (khống chế theo maxShield)
                 statplayer.playerShield = Mathf.Min(statplayer.playerShield + shieldGain, statplayer.maxShield);
 
-                Debug.Log($"🛡️ SHIELD: Cả cụm kẹo nổ giúp hồi {shieldGain} Khiên! (Khiên hiện tại: {statplayer.playerShield}/{statplayer.maxShield})");
+                Debug.Log($"🛡️ SHIELD COMBO: Nổ cụm {_currentFrameShieldMultiplier} viên Khiên! " +
+                          $"Tích lũy được +{shieldGain} điểm khiên. (Khiên hiện tại: {statplayer.playerShield}/{statplayer.maxShield})");
 
-                // Reset lại biến để chuẩn bị cho lượt đi/combo tiếp theo
+                // Reset lại biến đếm để chuẩn bị cho combo tiếp theo
                 _currentFrameShieldMultiplier = 0;
                 CheckBattleStatus();
             }
@@ -502,6 +640,45 @@ protected virtual void GameWin()
             // Kích hoạt trạng thái x3 Mana hồi phục trong 10 lượt
             seeTheSoulTurnsRemaining = 10;
             Debug.Log("👁️ [BUFF] See The Soul! Lượng Mana hồi phục khi ăn kẹo sẽ được nhân 3 trong 10 lượt tới!");
+        }
+        public void ActivateMindOfMeditation()
+        {
+            if (_isGameOver) return;
+
+            // Kích hoạt trạng thái x3 hồi máu từ kẹo HP trong 10 lượt
+            meditationTurnsRemaining = 10;
+            Debug.Log("🧘‍♂️ [BUFF] Mind of Meditation! Lượng HP hồi phục từ kẹo Trái Tim sẽ được nhân 3 trong 10 lượt tới!");
+        }
+        public void ActivatePhoenixWings()
+        {
+            if (_isGameOver) return;
+
+            // Kích hoạt trạng thái bảo hộ hồi sinh trong 10 lượt
+            phoenixWingsTurnsRemaining = 10;
+            Debug.Log("🔥 [BUFF] Phoenix Wings! Đôi cánh phượng hoàng dang rộng, bạn sẽ được tự động hồi sinh nếu cạn máu trong 10 lượt tới!");
+        }
+        public void ActivateHealingLeaf()
+        {
+            if (_isGameOver) return;
+
+            // Kích hoạt bùa lợi hồi máu trong 4 lượt
+            healingLeafTurnsRemaining = 4;
+            Debug.Log("🍃 [BUFF] Healing Leaf! Lá cây chữa lành bao bọc lấy bạn, hồi 7% máu tối đa mỗi lượt trong 4 lượt tới.");
+        }
+        public void ActivateTreeOfLife()
+        {
+            if (_isGameOver) return;
+
+            // 1. Tính toán lượng máu hồi phục = 70% Máu tối đa của người chơi
+            int healAmount = Mathf.RoundToInt(statplayer.playerMaxHp * 0.70f);
+
+            // 2. Tiến hành cộng máu và khống chế không cho vượt quá lượng máu tối đa (playerMaxHp)
+            statplayer.playerCurrentHp = Mathf.Min(statplayer.playerCurrentHp + healAmount, statplayer.playerMaxHp);
+
+            Debug.Log($"🌳 [SKILL] Tree of Life kích hoạt! Gọi ra đại thụ sinh mệnh, hồi ngay lập tức {healAmount} HP. Máu hiện tại: {statplayer.playerCurrentHp}/{statplayer.playerMaxHp}");
+
+            // Kiểm tra lại trạng thái trận đấu (nếu cần)
+            CheckBattleStatus();
         }
     }
 }
