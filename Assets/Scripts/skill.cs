@@ -53,7 +53,171 @@ public class skill : MonoBehaviour
     private const int MAX_TREE_CD = 5;
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.H) && PlayerStat.playerMana >= 20)
+        //if (Input.GetKeyDown(KeyCode.H) && PlayerStat.playerMana >= 20)
+        //{
+        //    if (hammerCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Giant Hammer đang hồi chiêu! Chờ {hammerCooldown} lượt.");
+        //        return;
+        //    }
+
+        //    isWaitingForHammerTarget = true;
+        //    PlayerStat.playerMana -= 20;
+        //    Debug.Log("🔨 [SKILL] Giant Hammer đã sẵn sàng! Hãy CLICK CHUỘT PHẢI vào viên kẹo muốn đập vỡ.");
+        //}
+
+        //// 🎯 XỬ LÝ CLICK CHUỘT PHẢI KHI ĐANG NHẤC BÚA
+        //if (isWaitingForHammerTarget && Input.GetMouseButtonDown(1)) // 1 là Chuột Phải
+        //{
+        //    ExecuteGiantHammer();
+        //}
+
+        //if (Input.GetKeyDown(KeyCode.V) && PlayerStat.playerMana >= 50)
+        //{
+        //    if (lightningCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Lightning Creation đang hồi! Chờ {lightningCooldown} lượt.");
+        //        return;
+        //    }
+
+        //    isWaitingForLightningTarget = true;
+        //    PlayerStat.playerMana -= 50;
+        //    Debug.Log("⚡ [SKILL] Lightning Creation đã bật! Hãy CLICK CHUỘT PHẢI vào một ô trên bàn cờ để tạo kẹo Cầu Vồng.");
+        //}
+
+        //// 🎯 XỬ LÝ CLICK CHUỘT PHẢI KHI ĐANG TRONG TRẠNG THÁI CHỜ
+        //if (isWaitingForLightningTarget && Input.GetMouseButtonDown(1)) // 1 là Chuột Phải
+        //{
+        //    ExecuteLightningCreation();
+            
+        //}
+        // Khi nhấn phím K
+        //if (Input.GetKeyDown(KeyCode.K)&& PlayerStat.playerMana>=20)
+        //{
+        //    // Kiểm tra xem skill có đang bị hồi chiêu hay không
+        //    if (poisonKnivesCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Kỹ năng đang hồi chiêu! Cần chờ thêm {poisonKnivesCooldown} lượt nữa.");
+        //        return; // Chặn lại, không cho chạy tiếp xuống hàm poision_knives()
+        //    }
+
+        //    poision_knives();
+        //    PlayerStat.playerMana-=20;
+        //}
+        //if (Input.GetKeyDown(KeyCode.L) && PlayerStat.playerMana >= 20)
+        //{
+        //    if (lifeStealCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Hút Máu đang hồi chiêu! Chờ {lifeStealCooldown} lượt.");
+        //        return;
+        //    }
+        //    life_steal();
+        //    PlayerStat.playerMana -= 20;
+        //}
+        //if (Input.GetKeyDown(KeyCode.I) && PlayerStat.playerMana >= 20)
+        //{
+        //    if (curseCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Lời Nguyền đang hồi chiêu! Chờ {curseCooldown} lượt.");
+        //        return;
+        //    }
+        //    curse_of_weak();
+        //    PlayerStat.playerMana -= 20;
+        //}
+        //if (Input.GetKeyDown(KeyCode.U) && PlayerStat.playerMana >= 30)
+        //{
+        //    if (frozenCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Đóng Băng đang hồi chiêu! Chờ {frozenCooldown} lượt.");
+        //        return;
+        //    }
+        //    frozen_skill();
+        //    PlayerStat.playerMana -= 30;
+        //}
+        //if (Input.GetKeyDown(KeyCode.O) && PlayerStat.playerMana >= 20)
+        //{
+        //    if (defenseCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Thế Thủ đang hồi chiêu! Chờ {defenseCooldown} lượt.");
+        //        return;
+        //    }
+        //    defense_stance();
+        //    PlayerStat.playerMana -= 20;
+        //}
+        //if (Input.GetKeyDown(KeyCode.P) && PlayerStat.playerMana >= 20)
+        //{
+        //    if (heavenShieldCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Khiên Thiên Đường đang hồi chiêu! Chờ {heavenShieldCooldown} lượt.");
+        //        return;
+        //    }
+        //    heaven_shield();
+        //    PlayerStat.playerMana -= 20;
+        //}
+        //if (Input.GetKeyDown(KeyCode.M) && PlayerStat.playerMana >= 30)
+        //{
+        //    if (wrathCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Cơn Thịnh Nộ đang hồi chiêu! Chờ {wrathCooldown} lượt.");
+        //        return;
+        //    }
+        //    the_wrath();
+        //    PlayerStat.playerMana -= 30;
+        //}
+        //if (Input.GetKeyDown(KeyCode.N) && PlayerStat.playerMana >= 30)
+        //{
+        //    if (seeTheSoulCooldown > 0 )
+        //    {
+        //        Debug.LogWarning($"⏳ See The Soul đang hồi chiêu! Chờ {seeTheSoulCooldown} lượt.");
+        //        return;
+        //    }
+        //    see_the_soul();
+        //    PlayerStat.playerMana -= 30;
+        //}
+        //if (Input.GetKeyDown(KeyCode.B) && PlayerStat.playerMana >= 30)
+        //{
+        //    if (meditationCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Mind of Meditation đang hồi chiêu! Chờ {meditationCooldown} lượt.");
+        //        return;
+        //    }
+        //    mind_of_meditation();
+        //    PlayerStat.playerMana -= 30;
+        //}
+        //if (Input.GetKeyDown(KeyCode.G) && PlayerStat.playerMana >= 50)
+        //{
+        //    if (phoenixCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Phoenix Wings đang hồi chiêu! Chờ {phoenixCooldown} lượt.");
+        //        return;
+        //    }
+        //    phoenix_wings();
+        //    PlayerStat.playerMana -=50;
+        //}
+        //if (Input.GetKeyDown(KeyCode.J) && PlayerStat.playerMana >= 50)
+        //{
+        //    if (healingLeafCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Healing Leaf đang hồi chiêu! Chờ {healingLeafCooldown} lượt.");
+        //        return;
+        //    }
+        //    healing_leaf();
+        //    PlayerStat.playerMana -= 50;
+        //}
+        //if (Input.GetKeyDown(KeyCode.T) && PlayerStat.playerMana >= 50)
+        //{
+        //    if (treeOfLifeCooldown > 0)
+        //    {
+        //        Debug.LogWarning($"⏳ Tree of Life đang hồi chiêu! Chờ {treeOfLifeCooldown} lượt.");
+        //        return;
+        //    }
+        //    tree_of_life();
+        //    PlayerStat.playerMana -= 50;
+        //}
+    }
+    public void ExecuteGiantHammer_active()
+    {
+        if (PlayerStat.playerMana >= 20)
         {
             if (hammerCooldown > 0)
             {
@@ -71,8 +235,10 @@ public class skill : MonoBehaviour
         {
             ExecuteGiantHammer();
         }
-
-        if (Input.GetKeyDown(KeyCode.V) && PlayerStat.playerMana >= 50)
+    }
+    public void ExecuteLightningCreation_active()
+    {
+        if (PlayerStat.playerMana >= 50)
         {
             if (lightningCooldown > 0)
             {
@@ -89,250 +255,207 @@ public class skill : MonoBehaviour
         if (isWaitingForLightningTarget && Input.GetMouseButtonDown(1)) // 1 là Chuột Phải
         {
             ExecuteLightningCreation();
-            
+
         }
-        // Khi nhấn phím K
-        if (Input.GetKeyDown(KeyCode.K)&& PlayerStat.playerMana>=20)
+    }
+    public void poision_knives()
+    {
+        if (PlayerStat.playerMana >= 20)
         {
-            // Kiểm tra xem skill có đang bị hồi chiêu hay không
             if (poisonKnivesCooldown > 0)
             {
                 Debug.LogWarning($"⏳ Kỹ năng đang hồi chiêu! Cần chờ thêm {poisonKnivesCooldown} lượt nữa.");
                 return; // Chặn lại, không cho chạy tiếp xuống hàm poision_knives()
             }
+            if (levelRef != null)
+            {
+                levelRef.rpgEffectsEnabled = true;
+                levelRef.ActivatePoisonKnives();
 
-            poision_knives();
-            PlayerStat.playerMana-=20;
+                // 🎯 KÍCH HOẠT COOLDOWN: Đặt số lượt chờ thành 3 ngay sau khi dùng thành công
+                poisonKnivesCooldown = MAX_COOLDOWN;
+                Debug.Log($"🗡️ Skill đã dùng! Bắt đầu hồi chiêu: {poisonKnivesCooldown} lượt.");
+            }
+            else
+            {
+                Debug.LogError("Chưa kéo thả Level vào ô levelRef trong script Skill!");
+            }
+            PlayerStat.playerMana -= 20;
         }
-        if (Input.GetKeyDown(KeyCode.L) && PlayerStat.playerMana >= 20)
+    }
+    public void life_steal()
+    {
+        if (PlayerStat.playerMana >= 20)
         {
             if (lifeStealCooldown > 0)
             {
                 Debug.LogWarning($"⏳ Hút Máu đang hồi chiêu! Chờ {lifeStealCooldown} lượt.");
                 return;
             }
-            life_steal();
+            if (levelRef != null)
+            {
+                levelRef.rpgEffectsEnabled = true;
+
+                // Gọi hàm xử lý hút máu bên Level.cs
+                levelRef.ActivateLifeSteal();
+
+                // Kích hoạt Cooldown 3 lượt cho Skill 2
+                lifeStealCooldown = MAX_LIFESTEAL_CD;
+                Debug.Log($"🩸 Skill Hút Máu đã dùng! Cooldown: {lifeStealCooldown} lượt.");
+            }
+            else
+            {
+                Debug.LogError("Chưa kéo thả Level vào ô levelRef trong script Skill!");
+            }
             PlayerStat.playerMana -= 20;
         }
-        if (Input.GetKeyDown(KeyCode.I) && PlayerStat.playerMana >= 20)
+    }
+    public void curse_of_weak()
+    {
+        if (PlayerStat.playerMana >= 20)
         {
             if (curseCooldown > 0)
             {
                 Debug.LogWarning($"⏳ Lời Nguyền đang hồi chiêu! Chờ {curseCooldown} lượt.");
                 return;
             }
-            curse_of_weak();
+            if (levelRef != null)
+            {
+                levelRef.rpgEffectsEnabled = true;
+
+                levelRef.ActivateCurseOfWeak();
+
+                curseCooldown = MAX_CURSE_CD;
+                Debug.Log($"🔮 Skill Lời Nguyền đã dùng! Cooldown: {curseCooldown} lượt.");
+            }
             PlayerStat.playerMana -= 20;
         }
-        if (Input.GetKeyDown(KeyCode.U) && PlayerStat.playerMana >= 30)
+    }
+    public void frozen_skill()
+    {
+        if (PlayerStat.playerMana >= 30)
         {
             if (frozenCooldown > 0)
             {
                 Debug.LogWarning($"⏳ Đóng Băng đang hồi chiêu! Chờ {frozenCooldown} lượt.");
                 return;
             }
-            frozen_skill();
+            if (levelRef != null)
+            {
+                levelRef.rpgEffectsEnabled = true;
+
+                levelRef.ActivateFrozen();
+
+                frozenCooldown = MAX_FROZEN_CD;
+                Debug.Log($"❄️ Skill Đóng Băng đã dùng! Cooldown: {frozenCooldown} lượt.");
+            }
             PlayerStat.playerMana -= 30;
         }
-        if (Input.GetKeyDown(KeyCode.O) && PlayerStat.playerMana >= 20)
+    }
+    public void defense_stance()
+    {
+        if (PlayerStat.playerMana >= 20)
         {
             if (defenseCooldown > 0)
             {
                 Debug.LogWarning($"⏳ Thế Thủ đang hồi chiêu! Chờ {defenseCooldown} lượt.");
                 return;
             }
-            defense_stance();
+            if (levelRef != null)
+            {
+                levelRef.rpgEffectsEnabled = true;
+
+                levelRef.ActivateDefenseStance();
+
+                defenseCooldown = MAX_DEFENSE_CD;
+                Debug.Log($"🛡️ Skill Thế Thủ đã dùng! Cooldown: {defenseCooldown} lượt.");
+            }
             PlayerStat.playerMana -= 20;
         }
-        if (Input.GetKeyDown(KeyCode.P) && PlayerStat.playerMana >= 20)
+    }
+    // 🎯 HÀM THÊM MỚI: Sẽ được gọi từ Level.cs khi người chơi kết thúc 1 lượt đi để giảm hồi chiêu
+    public void heaven_shield()
+    {
+        if (PlayerStat.playerMana >= 20)
         {
             if (heavenShieldCooldown > 0)
             {
                 Debug.LogWarning($"⏳ Khiên Thiên Đường đang hồi chiêu! Chờ {heavenShieldCooldown} lượt.");
                 return;
             }
-            heaven_shield();
+            if (levelRef != null)
+            {
+                levelRef.rpgEffectsEnabled = true;
+
+                levelRef.ActivateHeavenShield();
+
+                heavenShieldCooldown = MAX_HEAVEN_CD;
+                Debug.Log($"😇 Skill Khiên Thiên Đường đã dùng! Cooldown: {heavenShieldCooldown} lượt.");
+            }
             PlayerStat.playerMana -= 20;
         }
-        if (Input.GetKeyDown(KeyCode.M) && PlayerStat.playerMana >= 30)
+    }
+    public void the_wrath()
+    {
+        if (PlayerStat.playerMana >= 30)
         {
             if (wrathCooldown > 0)
             {
                 Debug.LogWarning($"⏳ Cơn Thịnh Nộ đang hồi chiêu! Chờ {wrathCooldown} lượt.");
                 return;
             }
-            the_wrath();
+            if (levelRef != null)
+            {
+                levelRef.rpgEffectsEnabled = true;
+
+                levelRef.ActivateTheWrath();
+
+                wrathCooldown = MAX_WRATH_CD;
+                Debug.Log($"🔥 Skill The Wrath đã dùng! Cooldown: {wrathCooldown} lượt.");
+            }
             PlayerStat.playerMana -= 30;
         }
-        if (Input.GetKeyDown(KeyCode.N) && PlayerStat.playerMana >= 30)
+    }
+    public void see_the_soul()
+    {
+        if (PlayerStat.playerMana >= 30)
         {
-            if (seeTheSoulCooldown > 0 )
+            if (seeTheSoulCooldown > 0)
             {
                 Debug.LogWarning($"⏳ See The Soul đang hồi chiêu! Chờ {seeTheSoulCooldown} lượt.");
                 return;
             }
-            see_the_soul();
+            if (levelRef != null)
+            {
+                levelRef.rpgEffectsEnabled = true;
+
+                levelRef.ActivateSeeTheSoul();
+
+                seeTheSoulCooldown = MAX_SOUL_CD;
+                Debug.Log($"👁️ Skill See The Soul đã dùng! Cooldown: {seeTheSoulCooldown} lượt.");
+            }
             PlayerStat.playerMana -= 30;
         }
-        if (Input.GetKeyDown(KeyCode.B) && PlayerStat.playerMana >= 30)
+    }
+    public void mind_of_meditation()
+    {
+        if (PlayerStat.playerMana >= 30)
         {
             if (meditationCooldown > 0)
             {
                 Debug.LogWarning($"⏳ Mind of Meditation đang hồi chiêu! Chờ {meditationCooldown} lượt.");
                 return;
             }
-            mind_of_meditation();
+            if (levelRef != null)
+            {
+                levelRef.rpgEffectsEnabled = true;
+
+                levelRef.ActivateMindOfMeditation();
+
+                meditationCooldown = MAX_MEDITATION_CD;
+                Debug.Log($"🧘‍♂️ Skill Mind of Meditation đã dùng! Cooldown: {meditationCooldown} lượt.");
+            }
             PlayerStat.playerMana -= 30;
-        }
-        if (Input.GetKeyDown(KeyCode.G) && PlayerStat.playerMana >= 50)
-        {
-            if (phoenixCooldown > 0)
-            {
-                Debug.LogWarning($"⏳ Phoenix Wings đang hồi chiêu! Chờ {phoenixCooldown} lượt.");
-                return;
-            }
-            phoenix_wings();
-            PlayerStat.playerMana -=50;
-        }
-        if (Input.GetKeyDown(KeyCode.J) && PlayerStat.playerMana >= 50)
-        {
-            if (healingLeafCooldown > 0)
-            {
-                Debug.LogWarning($"⏳ Healing Leaf đang hồi chiêu! Chờ {healingLeafCooldown} lượt.");
-                return;
-            }
-            healing_leaf();
-            PlayerStat.playerMana -= 50;
-        }
-        if (Input.GetKeyDown(KeyCode.T) && PlayerStat.playerMana >= 50)
-        {
-            if (treeOfLifeCooldown > 0)
-            {
-                Debug.LogWarning($"⏳ Tree of Life đang hồi chiêu! Chờ {treeOfLifeCooldown} lượt.");
-                return;
-            }
-            tree_of_life();
-            PlayerStat.playerMana -= 50;
-        }
-    }
-
-    public void poision_knives()
-    {
-        if (levelRef != null)
-        {
-            levelRef.rpgEffectsEnabled = true;
-            levelRef.ActivatePoisonKnives();
-
-            // 🎯 KÍCH HOẠT COOLDOWN: Đặt số lượt chờ thành 3 ngay sau khi dùng thành công
-            poisonKnivesCooldown = MAX_COOLDOWN;
-            Debug.Log($"🗡️ Skill đã dùng! Bắt đầu hồi chiêu: {poisonKnivesCooldown} lượt.");
-        }
-        else
-        {
-            Debug.LogError("Chưa kéo thả Level vào ô levelRef trong script Skill!");
-        }
-    }
-    public void life_steal()
-    {
-        if (levelRef != null)
-        {
-            levelRef.rpgEffectsEnabled = true;
-
-            // Gọi hàm xử lý hút máu bên Level.cs
-            levelRef.ActivateLifeSteal();
-
-            // Kích hoạt Cooldown 3 lượt cho Skill 2
-            lifeStealCooldown = MAX_LIFESTEAL_CD;
-            Debug.Log($"🩸 Skill Hút Máu đã dùng! Cooldown: {lifeStealCooldown} lượt.");
-        }
-        else
-        {
-            Debug.LogError("Chưa kéo thả Level vào ô levelRef trong script Skill!");
-        }
-    }
-    public void curse_of_weak()
-    {
-        if (levelRef != null)
-        {
-            levelRef.rpgEffectsEnabled = true;
-
-            levelRef.ActivateCurseOfWeak();
-
-            curseCooldown = MAX_CURSE_CD;
-            Debug.Log($"🔮 Skill Lời Nguyền đã dùng! Cooldown: {curseCooldown} lượt.");
-        }
-    }
-    public void frozen_skill()
-    {
-        if (levelRef != null)
-        {
-            levelRef.rpgEffectsEnabled = true;
-
-            levelRef.ActivateFrozen();
-
-            frozenCooldown = MAX_FROZEN_CD;
-            Debug.Log($"❄️ Skill Đóng Băng đã dùng! Cooldown: {frozenCooldown} lượt.");
-        }
-    }
-    public void defense_stance()
-    {
-        if (levelRef != null)
-        {
-            levelRef.rpgEffectsEnabled = true;
-
-            levelRef.ActivateDefenseStance();
-
-            defenseCooldown = MAX_DEFENSE_CD;
-            Debug.Log($"🛡️ Skill Thế Thủ đã dùng! Cooldown: {defenseCooldown} lượt.");
-        }
-    }
-    // 🎯 HÀM THÊM MỚI: Sẽ được gọi từ Level.cs khi người chơi kết thúc 1 lượt đi để giảm hồi chiêu
-    public void heaven_shield()
-    {
-        if (levelRef != null)
-        {
-            levelRef.rpgEffectsEnabled = true;
-
-            levelRef.ActivateHeavenShield();
-
-            heavenShieldCooldown = MAX_HEAVEN_CD;
-            Debug.Log($"😇 Skill Khiên Thiên Đường đã dùng! Cooldown: {heavenShieldCooldown} lượt.");
-        }
-    }
-    public void the_wrath()
-    {
-        if (levelRef != null)
-        {
-            levelRef.rpgEffectsEnabled = true;
-
-            levelRef.ActivateTheWrath();
-
-            wrathCooldown = MAX_WRATH_CD;
-            Debug.Log($"🔥 Skill The Wrath đã dùng! Cooldown: {wrathCooldown} lượt.");
-        }
-    }
-    public void see_the_soul()
-    {
-        if (levelRef != null)
-        {
-            levelRef.rpgEffectsEnabled = true;
-
-            levelRef.ActivateSeeTheSoul();
-
-            seeTheSoulCooldown = MAX_SOUL_CD;
-            Debug.Log($"👁️ Skill See The Soul đã dùng! Cooldown: {seeTheSoulCooldown} lượt.");
-        }
-    }
-    public void mind_of_meditation()
-    {
-        if (levelRef != null)
-        {
-            levelRef.rpgEffectsEnabled = true;
-
-            levelRef.ActivateMindOfMeditation();
-
-            meditationCooldown = MAX_MEDITATION_CD;
-            Debug.Log($"🧘‍♂️ Skill Mind of Meditation đã dùng! Cooldown: {meditationCooldown} lượt.");
         }
     }
 
@@ -396,42 +519,71 @@ public class skill : MonoBehaviour
     }
     public void phoenix_wings()
     {
-        if (levelRef != null)
+        if (PlayerStat.playerMana >= 50)
         {
-            levelRef.rpgEffectsEnabled = true;
+            if (phoenixCooldown > 0)
+            {
+                Debug.LogWarning($"⏳ Phoenix Wings đang hồi chiêu! Chờ {phoenixCooldown} lượt.");
+                return;
+            }
+            if (levelRef != null)
+            {
+              
+                levelRef.rpgEffectsEnabled = true;
 
-            levelRef.ActivatePhoenixWings();
+                levelRef.ActivatePhoenixWings();
 
-            phoenixCooldown = MAX_PHOENIX_CD;
-            Debug.Log($"🔥 Skill Phoenix Wings đã dùng! Cooldown: {phoenixCooldown} lượt.");
+                phoenixCooldown = MAX_PHOENIX_CD;
+                Debug.Log($"🔥 Skill Phoenix Wings đã dùng! Cooldown: {phoenixCooldown} lượt.");
+               
+            }
+            PlayerStat.playerMana -= 50;
         }
     }
     public void healing_leaf()
     {
-        if (levelRef != null)
+        if (PlayerStat.playerMana >= 50)
         {
-            levelRef.rpgEffectsEnabled = true;
+            if (healingLeafCooldown > 0)
+            {
+                Debug.LogWarning($"⏳ Healing Leaf đang hồi chiêu! Chờ {healingLeafCooldown} lượt.");
+                return;
+            }
+            if (levelRef != null)
+            {
+                levelRef.rpgEffectsEnabled = true;
 
-            // Gọi hàm buff từ Level sang
-            levelRef.ActivateHealingLeaf();
+                // Gọi hàm buff từ Level sang
+                levelRef.ActivateHealingLeaf();
 
-            // Áp thời gian hồi chiêu
-            healingLeafCooldown = MAX_HEAL_LEAF_CD;
-            Debug.Log($"🍃 Kỹ năng Healing Leaf đã sử dụng! Cooldown: {healingLeafCooldown} lượt.");
+                // Áp thời gian hồi chiêu
+                healingLeafCooldown = MAX_HEAL_LEAF_CD;
+                Debug.Log($"🍃 Kỹ năng Healing Leaf đã sử dụng! Cooldown: {healingLeafCooldown} lượt.");
+            }
+            PlayerStat.playerMana -= 50;
         }
     }
     public void tree_of_life()
     {
-        if (levelRef != null)
+        if (PlayerStat.playerMana >= 50)
         {
-            levelRef.rpgEffectsEnabled = true;
+            if (treeOfLifeCooldown > 0)
+            {
+                Debug.LogWarning($"⏳ Tree of Life đang hồi chiêu! Chờ {treeOfLifeCooldown} lượt.");
+                return;
+            }
+            if (levelRef != null)
+            {
+                levelRef.rpgEffectsEnabled = true;
 
-            // Gọi hàm xử lý hồi máu tức thì từ Level sang
-            levelRef.ActivateTreeOfLife();
+                // Gọi hàm xử lý hồi máu tức thì từ Level sang
+                levelRef.ActivateTreeOfLife();
 
-            // Áp thời gian hồi chiêu
-            treeOfLifeCooldown = MAX_TREE_CD;
-            Debug.Log($"🌳 Kỹ năng Tree of Life đã sử dụng! Cooldown: {treeOfLifeCooldown} lượt.");
+                // Áp thời gian hồi chiêu
+                treeOfLifeCooldown = MAX_TREE_CD;
+                Debug.Log($"🌳 Kỹ năng Tree of Life đã sử dụng! Cooldown: {treeOfLifeCooldown} lượt.");
+            }
+            PlayerStat.playerMana -= 50;
         }
     }
     public void ReduceCooldown()
