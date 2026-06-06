@@ -35,6 +35,8 @@ namespace Match3
         private int healingLeafTurnsRemaining = 0; // Số lượt hồi máu còn lại
         private float healingLeafPercent = 0.07f;  // 7% máu mỗi lượt
 
+        public Animator enemyAnimator;
+
         private int _currentFrameSwordCount = 0;
         private void Start()
         {
@@ -76,6 +78,7 @@ namespace Match3
             // ==========================================
             if (piece.Type == PieceType.Rainbow)
             {
+                PlayEnemyHitAnimation(); // animation hit
                 int lightningDamage = statplayer.playerSp * 2;
                 enemy.enemyCurrentHp -= lightningDamage;
 
@@ -167,6 +170,7 @@ namespace Match3
 
                 // 3. Tính toán tổng sát thương cuối cùng
                 int finalDamage = statplayer.playerAttack * swordMultiplier * wrathMultiplier;
+                PlayEnemyHitAnimation(); // animation hit
                 enemy.enemyCurrentHp -= finalDamage;
 
                 // In nhật ký log ra màn hình Console để dễ theo dõi
@@ -352,11 +356,15 @@ namespace Match3
                 // Thoát khỏi Coroutine ngay tại đây, quái hoàn toàn không làm gì được bạn!
                 yield break;
             }
-
+ 
             // Bước 3: Quái vật bắt đầu tấn công
             Debug.Log("👹 [LƯỢT QUÁI] Quái vật chuẩn bị ra đòn!");
-            yield return new WaitForSeconds(0.5f); // Tạo một khoảng hoãn nhỏ tạo cảm giác chuyển lượt rõ ràng hơn
-
+            // BẬT BOOL ATTACK LÊN TRUE
+            //enemyAnimator.SetBool("Attack", true);
+            yield return new WaitForSeconds(0.5f);// Tạo một khoảng hoãn nhỏ tạo cảm giác chuyển lượt rõ ràng hơn
+            enemyAnimator.SetBool("Attack", true);
+            yield return new WaitForSeconds(1f);
+            enemyAnimator.SetBool("Attack", false);
             // =========================================================================
             // 🔮 TÍCH HỢP LỜI NGUYỀN: Tính toán sát thương thực tế của quái ở lượt này
             // =========================================================================
@@ -477,6 +485,7 @@ namespace Match3
 
                 case ColorType.Spell:
                     // NHÂN THÊM WRATH MULTIPLIER VÀO SÁT THƯƠNG PHÉP
+                    PlayEnemyHitAnimation(); // animation hit
                     int spellDamage = statplayer.playerSp * multiplier * wrathMultiplier;
                     enemy.enemyCurrentHp -= spellDamage;
 
@@ -522,6 +531,26 @@ namespace Match3
                 // Reset lại biến đếm để chuẩn bị cho combo tiếp theo
                 _currentFrameShieldMultiplier = 0;
                 CheckBattleStatus();
+            }
+        }
+
+        // HÀM MỚI: Phát ra animation đánh khi quái vật bị sát thương
+        public void PlayEnemyHitAnimation()
+        {
+            // Reset trigger cũ tránh bị lỗi spam animation
+            enemyAnimator.ResetTrigger("Hit1");
+            enemyAnimator.ResetTrigger("Hit2");
+
+            // Random 0 hoặc 1
+            int randomHit = Random.Range(0, 2);
+
+            if (randomHit == 0)
+            {
+                enemyAnimator.SetTrigger("Hit1");
+            }
+            else
+            {
+                enemyAnimator.SetTrigger("Hit2");
             }
         }
         // HÀM MỚI: Xử lý khi người chơi vuốt cục Lv2 và Lv3 cùng lúc (Nhân 3)
