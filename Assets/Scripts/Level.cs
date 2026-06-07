@@ -36,6 +36,9 @@ namespace Match3
         private float healingLeafPercent = 0.07f;  // 7% máu mỗi lượt
 
         public Animator enemyAnimator;
+        [Header("Lightning Effect")]
+        public GameObject lightningEffectPrefab; // Prefab tia sét
+        public Transform lightningSpawnPoint;    // Vị trí xuất hiện effect
 
         private int _currentFrameSwordCount = 0;
         private void Start()
@@ -58,6 +61,30 @@ namespace Match3
                 statplayer.maxShield = 20;
             }
         }
+        ///hieu ung tia sét
+       private void SpawnLightningEffect()
+        {
+            if (lightningEffectPrefab != null && lightningSpawnPoint != null)
+            {
+                GameObject fx = Instantiate(
+                    lightningEffectPrefab,
+                    lightningSpawnPoint.position,
+                    lightningSpawnPoint.rotation
+                );
+
+                ParticleSystem ps = fx.GetComponent<ParticleSystem>();
+
+                if (ps != null)
+                {
+                    ps.Play();
+                    Destroy(fx, ps.main.duration + ps.main.startLifetime.constantMax);
+                }
+                else
+                {
+                    //Destroy(fx, 3f);
+                }
+            }
+        }
 
         public LevelType Type => type;
         // 1. Thêm biến này vào cùng cụm nhóm trạng thái (ở gần các biến _isGameOver)
@@ -78,8 +105,10 @@ namespace Match3
             // ==========================================
             if (piece.Type == PieceType.Rainbow)
             {
+                
                 PlayEnemyHitAnimation(); // animation hit
                 int lightningDamage = statplayer.playerSp * 2;
+                SpawnLightningEffect(); // gọi hiệu ứng tia sét
                 enemy.enemyCurrentHp -= lightningDamage;
 
                 Debug.Log($"⚡ TIA SÉT đánh trúng! Gây {lightningDamage} Sát thương lên quái!");
