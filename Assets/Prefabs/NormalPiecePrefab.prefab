@@ -169,15 +169,15 @@ MonoBehaviour:
   currentColor: 0
   colorSprites:
   - color: 3
-    sprite: {fileID: 21300000, guid: e29e5c50eb44a82419421fea09be3ecc, type: 3}
-  - color: 5
-    sprite: {fileID: 21300000, guid: 1135bb60951193b48b0abe5d01de0386, type: 3}
+    sprite: {fileID: -629083749, guid: 4bf412135c6bb4c40ab68e08e3a0bfef, type: 3}
+  - color: 4
+    sprite: {fileID: -1871577824, guid: 27b518d639021ab46ae128f35b474092, type: 3}
   - color: 1
-    sprite: {fileID: 21300000, guid: 60172776f27911d49a3eefdabe14db05, type: 3}
+    sprite: {fileID: 1642336039, guid: 9c5259343aa53b545a9e346722200baf, type: 3}
   - color: 2
-    sprite: {fileID: 21300000, guid: 5883b85230b5f94418632fa1c1b1b605, type: 3}
+    sprite: {fileID: 368997863, guid: 174e2d9fe174aa0428078c33cbb9fefa, type: 3}
   - color: 0
-    sprite: {fileID: 21300000, guid: 4598661072bfa6945a5305c9a4bbb24f, type: 3}
+    sprite: {fileID: -159197812, guid: 093742d85fc69934db4f26b96b10a891, type: 3}
 --- !u!61 &61605422268151138
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -212,7 +212,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.5, y: -0.5}
+  m_Offset: {x: 0.2772739, y: -0.47614318}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -222,7 +222,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.9544835, y: 0.92469597}
   m_EdgeRadius: 0
 --- !u!95 &95970875753207710
 Animator:

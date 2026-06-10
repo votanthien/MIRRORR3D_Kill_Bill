@@ -95,13 +95,8 @@ namespace Match3
             {
                 for (int y = 0; y < yDim; y++)
                 {
-                    GameObject background = Instantiate(backgroundPrefab, transform);
-
-                    // 🔥 CÔNG THỨC MỚI: Căn chuẩn tâm cho từng ô Box nền
-                    float posX = transform.position.x - (xDim - 1) / 2.0f + x;
-                    float posY = transform.position.y - (yDim - 1) / 2.0f + (yDim - 1 - y);
-
-                    background.transform.position = new Vector2(posX, posY);
+                    GameObject background = Instantiate(backgroundPrefab, GetWorldPosition(x, y), Quaternion.identity);
+                    background.transform.parent = transform;
                 }
             }
 
