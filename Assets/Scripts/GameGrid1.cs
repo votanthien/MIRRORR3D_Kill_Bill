@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Match3
 {
-    public class GameGrid : MonoBehaviour
+    public class GameGrid1 : GameGrid
     {
         [System.Serializable]
         public struct PiecePrefab
