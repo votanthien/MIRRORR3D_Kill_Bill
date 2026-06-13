@@ -40,7 +40,11 @@ namespace Match3
         public GameObject lightningEffectPrefab; // Prefab tia sét
         public Transform lightningSpawnPoint;    // Vị trí xuất hiện effect
 
-        private int _currentFrameSwordCount = 0;
+        private int _currentFrameSwordCount = 0; private int _currentFrameSpellCount = 0; // Đếm số lượng kẹo Spell nổ cùng lúc trong khung hình
+
+        private int playerLevel = 1;        // Cấp độ hiện tại của người chơi
+        private int piecesEatenCount = 0;   // Bộ đếm số lượng viên kẹo đã ăn trong cấp này
+        private const int PIECES_TO_LEVEL_UP = 20; // Mốc yêu cầu để lên cấp (20 cục)
         private void Start()
         {
             hud.SetScore(currentScore);
@@ -97,7 +101,16 @@ namespace Match3
 
             currentScore += piece.score;
             hud.SetScore(currentScore);
+            piecesEatenCount++; // Cứ ăn 1 cục (bất kỳ loại nào) thì cộng 1 điểm
 
+            if (piecesEatenCount >= PIECES_TO_LEVEL_UP)
+            {
+                playerLevel++;          // Tăng cấp độ lên 1
+                piecesEatenCount = 0;   // Reset bộ đếm về 0 để tính cho level tiếp theo
+
+                // In ra Debug.Log thông báo người chơi đã lên cấp theo yêu cầu
+                Debug.Log($"✨ [LEVEL UP] Chúc mừng! Bạn đã ăn đủ 20 cục kẹo và lên LEVEL {playerLevel}!");
+            }
             if (!rpgEffectsEnabled) return;
 
             // ==========================================
@@ -161,6 +174,15 @@ namespace Match3
                     // Nếu viên nổ là hàng Clear (Lv2) hoặc Lv3, chúng ta cộng tương ứng theo multiplier để tính thưởng viên
                     _currentFrameSwordCount += multiplier;
                 }
+                else if (colorType == ColorType.Spell)
+                {
+                    if (_currentFrameSpellCount == 0)
+                    {
+                        // Kích hoạt bộ xử lý tính điểm Spell vào cuối khung hình
+                        StartCoroutine(ApplySpellPointsAtEndOfFrame());
+                    }
+                    _currentFrameSpellCount += multiplier;
+                }
                 else
                 {
                     // Kiếm, HP, Mana, Spell vẫn giữ nguyên (nổ viên nào tính sát thương viên đó)
@@ -169,6 +191,47 @@ namespace Match3
             }
 
             CheckBattleStatus();
+        }
+        private IEnumerator ApplySpellPointsAtEndOfFrame()
+        {
+            // Đợi toàn bộ các viên kẹo Spell trong lượt combo này nổ sạch hoàn toàn
+            yield return new WaitForEndOfFrame();
+
+            if (_currentFrameSpellCount > 0)
+            {
+                // 1. Xác định hệ số nhân sát thương phép dựa trên số lượng kẹo Spell (Giống hệt Kiếm)
+                int spellMultiplier = 3; // Ăn 3 viên = nhân 3
+
+                if (_currentFrameSpellCount == 4)
+                {
+                    spellMultiplier = 6; // Ăn 4 viên = nhân 6
+                }
+                else if (_currentFrameSpellCount >= 5)
+                {
+                    spellMultiplier = 12; // Ăn 5 viên trở lên = nhân 12
+                }
+                else if (_currentFrameSpellCount < 3)
+                {
+                    spellMultiplier = _currentFrameSpellCount;
+                }
+
+                // 2. Tính toán lượng sát thương Phép (Spell Damage) dựa trên chỉ số của người chơi
+                // Giả sử bạn dùng thuộc tính statplayer.playerAttack hoặc một biến phép riêng như statplayer.playerMagic
+                int baseMagicAttack = statplayer.playerAttack;
+                int totalSpellDamage = baseMagicAttack * spellMultiplier;
+
+                // 3. Trừ thẳng vào máu quái vật (Enemy)
+                enemy.enemyCurrentHp -= totalSpellDamage;
+
+                // 4. Hiển thị Log thông báo sát thương Phép ra Console
+                Debug.Log($"🔮 SPELL ATTACK: Phá hủy tổng cộng {_currentFrameSpellCount} viên Spell! " +
+                          $"Hệ số phép: x{spellMultiplier}. Gây {totalSpellDamage} Sát thương Phép thẳng vào Quái! " +
+                          $"(Máu quái còn lại: {enemy.enemyCurrentHp})");
+
+                // 5. Reset bộ đếm và cập nhật trạng thái trận đấu (kiểm tra xem quái chết chưa)
+                _currentFrameSpellCount = 0;
+                CheckBattleStatus();
+            }
         }
         private IEnumerator ApplySwordDamageAtEndOfFrame()
         {
@@ -512,15 +575,7 @@ namespace Match3
                     Debug.Log($"❤️ HP! Hồi {hpRestore} Máu! (x{multiplier}) {meditationMsg}");
                     break;
 
-                case ColorType.Spell:
-                    // NHÂN THÊM WRATH MULTIPLIER VÀO SÁT THƯƠNG PHÉP
-                    PlayEnemyHitAnimation(); // animation hit
-                    int spellDamage = statplayer.playerSp * multiplier * wrathMultiplier;
-                    enemy.enemyCurrentHp -= spellDamage;
-
-                    string spellMsg = wrathMultiplier > 1 ? "[🔥 X3 WRATH]" : "";
-                    Debug.Log($"✨ Spell! Gây {spellDamage} Sát thương phép! (x{multiplier}) {spellMsg}");
-                    break;
+               ;
             }
         }
         private IEnumerator ApplyShieldAtEndOfFrame()
