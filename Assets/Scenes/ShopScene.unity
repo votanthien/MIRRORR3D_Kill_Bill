@@ -2582,6 +2582,73 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 286303053}
   m_CullTransparentMesh: 1
+--- !u!1 &290022081
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 290022083}
+  - component: {fileID: 290022082}
+  m_Layer: 0
+  m_Name: ShopUIController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &290022082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290022081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44d207806ac2cfa4c89d771731fb238e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShopUIFlowController
+  _canvasSelect: {fileID: 1645233905}
+  _canvasStats: {fileID: 1328878981}
+  _chooseSelect: {fileID: 1670586012}
+  _characterButtons:
+  - {fileID: 480465973}
+  - {fileID: 49388491}
+  - {fileID: 1957317467}
+  - {fileID: 1450022007}
+  - {fileID: 924134201}
+  _characterNames:
+  - A
+  - B
+  - C
+  - D
+  - E
+  _nameGText: {fileID: 394009386}
+  _statsBackButton: {fileID: 583312235}
+  _statsTabGroup: {fileID: 940377430}
+  _panelHide: {fileID: 969532251}
+  _panelShow: {fileID: 1392614300}
+  _upgradeButton: {fileID: 1877769842}
+  _upgradeBackButton: {fileID: 1413202439}
+  _upgradeTabGroup: {fileID: 505463827}
+--- !u!4 &290022083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290022081}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &302404251
 GameObject:
   m_ObjectHideFlags: 0
@@ -4930,6 +4997,57 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 502924937}
   m_CullTransparentMesh: 1
+--- !u!1 &505463826
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 505463828}
+  - component: {fileID: 505463827}
+  m_Layer: 0
+  m_Name: 'UpgradeTabGroup '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &505463827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 505463826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 284eb6b1c21f60642a0727e7e5816031, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TabGroup
+  _tabs:
+  - tabButton: {fileID: 2088688938}
+    contentPanel: {fileID: 942576997}
+    indicator: {fileID: 2123475978}
+  - tabButton: {fileID: 1978641424}
+    contentPanel: {fileID: 1025519154}
+    indicator: {fileID: 2116943934}
+--- !u!4 &505463828
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 505463826}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.99858, y: -0, z: 9.001}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &535496771
 GameObject:
   m_ObjectHideFlags: 0
@@ -7662,8 +7780,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 440}
-  m_SizeDelta: {x: 190, y: 190}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 185, y: 185}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &761284859
 MonoBehaviour:
@@ -9985,6 +10103,57 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 930808022}
   m_CullTransparentMesh: 1
+--- !u!1 &940377429
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 940377431}
+  - component: {fileID: 940377430}
+  m_Layer: 0
+  m_Name: 'StatsTabGroup '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &940377430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 940377429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 284eb6b1c21f60642a0727e7e5816031, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TabGroup
+  _tabs:
+  - tabButton: {fileID: 347085522}
+    contentPanel: {fileID: 348746252}
+    indicator: {fileID: 0}
+  - tabButton: {fileID: 1153061884}
+    contentPanel: {fileID: 1617057904}
+    indicator: {fileID: 0}
+--- !u!4 &940377431
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 940377429}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.99858, y: -0, z: 9.001}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &942576997
 GameObject:
   m_ObjectHideFlags: 0
@@ -13667,10 +13836,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -16899,7 +17068,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &1645233909
 RectTransform:
@@ -21798,3 +21967,6 @@ SceneRoots:
   - {fileID: 1891206584}
   - {fileID: 1112972192}
   - {fileID: 1777605036}
+  - {fileID: 290022083}
+  - {fileID: 940377431}
+  - {fileID: 505463828}
