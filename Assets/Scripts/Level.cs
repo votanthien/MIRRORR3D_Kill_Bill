@@ -53,6 +53,20 @@ namespace Match3
             statplayer.playerCurrentHp = statplayer.playerMaxHp;
             enemy.enemyCurrentHp = enemy.enemyMaxHp;
             _isGameOver = false;
+
+          
+                // Đọc dữ liệu từ Slot mà người chơi vừa ấn chọn từ Menu ngoài kia
+                GameSaveData loadedData = SaveManager.LoadGame(SaveManager.SelectedSlotIndex);
+
+                if (loadedData.hasData)
+                {
+                    // Áp dụng các thông số đã lưu vào nhân vật hiện tại
+                    this.playerLevel = loadedData.playerLevel;
+                    this.statplayer.playerCurrentHp = loadedData.playerCurrentHp;
+                    this.statplayer.playerAttack = loadedData.playerAttack;
+                    Debug.Log($"⚔️ Đã đồng bộ dữ liệu nhân vật Level {this.playerLevel} vào trận đấu!");
+                }
+            
         }
         private void Update()
         {
@@ -110,6 +124,7 @@ namespace Match3
 
                 // In ra Debug.Log thông báo người chơi đã lên cấp theo yêu cầu
                 Debug.Log($"✨ [LEVEL UP] Chúc mừng! Bạn đã ăn đủ 20 cục kẹo và lên LEVEL {playerLevel}!");
+                GameplaySaveBridge.Instance.TriggerAutoSave();
             }
             if (!rpgEffectsEnabled) return;
 
